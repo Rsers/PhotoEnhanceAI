@@ -1,0 +1,20 @@
+# SwinIR Environment Requirements
+# PyTorch and related packages
+torch==2.4.1+cu118
+torchvision==0.19.1+cu118
+torchaudio==2.4.1+cu118
+
+# Image processing
+opencv-python==4.12.0.88
+Pillow==10.2.0
+numpy==1.24.1
+scikit-image==0.21.0
+
+# Utilities
+tqdm==4.67.1
+pyyaml==6.0.2
+argparse
+
+# Additional dependencies
+scipy==1.10.1
+matplotlib==3.7.5

@@ -1,0 +1,106 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+swinir_env/
+gfpgan_env/
+venv/
+env/
+ENV/
+
+# Model files (large files, should be downloaded separately)
+models/swinir/
+models/gfpgan/
+*.pth
+*.pkl
+*.bin
+*.safetensors
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# Processing results
+results/
+outputs/
+processed/
+examples/processed/
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Cache
+.cache/
+*.cache
+
+# GPU cache
+.nv/
+
+# Docker
+.dockerignore
+Dockerfile.dev
+
+# Backup files
+*.bak
+*.backup
+
+# Large test images (should be in examples/ but ignored from git)
+examples/*.jpg
+examples/*.png
+examples/*.jpeg
+!examples/sample_*.jpg
+!examples/sample_*.png
