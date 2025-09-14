@@ -104,3 +104,16 @@ examples/*.png
 examples/*.jpeg
 !examples/sample_*.jpg
 !examples/sample_*.png
+
+# Processing directories (generated content)
+input/
+output/
+**/.trash/
+
+# Temporary log files
+/tmp/gfpgan_process.log
+*.log
+
+# Backup files
+*.backup
+README.md.backup

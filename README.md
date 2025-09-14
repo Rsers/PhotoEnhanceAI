@@ -13,49 +13,52 @@ AI驱动的人像图像增强服务，使用GFPGAN一体化解决方案，集成
 
 ## 🚀 快速开始
 
-### 一键部署
+### 一键安装（推荐）
+
+在新服务器上从零部署：
 
 ```bash
+# 克隆项目
 git clone https://github.com/Rsers/PhotoEnhanceAI.git
 cd PhotoEnhanceAI
-chmod +x deploy/setup_environment.sh
-./deploy/setup_environment.sh
-chmod +x models/download_models.sh
-./models/download_models.sh
-python api/start_server.py
+
+# 一键安装
+chmod +x install.sh
+./install.sh
 ```
 
 ### 手动安装
 
-1. **创建虚拟环境**
+1. **安装系统依赖**
 ```bash
-# GFPGAN环境 (主要处理环境)
-python3 -m venv gfpgan_env
-source gfpgan_env/bin/activate
-pip install -r requirements/gfpgan_requirements.txt
-deactivate
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install -y python3-venv python3-dev python3-pip \
+    libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev \
+    libgomp1 git wget curl build-essential cmake
 
-# API环境
-python3 -m venv api_env
-source api_env/bin/activate
-pip install -r requirements/api_requirements.txt
-deactivate
+# CentOS/RHEL
+sudo yum install -y python3-devel python3-pip mesa-libGL gcc git wget curl cmake
 ```
 
-2. **下载模型文件**
+2. **设置环境**
 ```bash
-mkdir -p models/gfpgan
+# 运行环境安装脚本
+chmod +x deploy/setup_gfpgan_env.sh
+./deploy/setup_gfpgan_env.sh
 
-# GFPGAN模型 (约350MB) - 集成人脸修复和超分辨率
-wget -O models/gfpgan/GFPGANv1.4.pth \
-  https://github.com/TencentARC/GFPGAN/releases/download/v1.3.8/GFPGANv1.4.pth
-
-# 注意: GFPGAN内置RealESRGAN，无需额外下载超分辨率模型
+# 下载模型文件
+chmod +x deploy/download_gfpgan_model.sh
+./deploy/download_gfpgan_model.sh
 ```
 
-3. **启动API服务**
+3. **测试安装**
 ```bash
-python api/start_server.py
+# 测试环境
+./test_installation.sh
+
+# 处理测试图片
+python gfpgan_cli.py --input input/test001.jpg --output output/enhanced.jpg --scale 4
 ```
 
 ## 🌐 API使用
@@ -171,36 +174,51 @@ PhotoEnhanceAI/
 ├── config/                # 配置文件
 │   └── settings.py        # API配置
 ├── scripts/               # 核心处理脚本
-│   ├── reverse_portrait_pipeline.py  # 反向流水线
-│   ├── social_media_upscale.py      # SwinIR处理
-│   └── inference_gfpgan.py          # GFPGAN推理
+│   ├── gfpgan_enhance.py  # GFPGAN一体化增强
+├── gfpgan/                # GFPGAN核心模块
+│   ├── inference_gfpgan.py # GFPGAN推理脚本
+│   ├── archs/             # 网络架构
+│   ├── models/            # 模型定义
+│   └── utils.py           # 工具函数
 ├── deploy/                # 部署脚本
 │   ├── setup_environment.sh        # 环境安装
 │   └── production_setup.sh         # 生产部署
 ├── models/                # AI模型文件
 │   ├── download_models.sh # 模型下载脚本
-│   ├── swinir/           # SwinIR模型
-│   └── gfpgan/           # GFPGAN模型
+│   └── gfpgan/           # GFPGAN模型文件
 ├── requirements/          # 依赖文件
-│   ├── swinir_requirements.txt
 │   ├── gfpgan_requirements.txt
 │   └── api_requirements.txt
 ├── docs/                  # 文档
 │   ├── deployment.md      # 部署指南
 │   ├── frontend-integration.md  # 前端集成
 │   └── api.md            # API文档
+├── input/                 # 输入图片目录
+├── output/                # 输出结果目录
 └── examples/             # 示例代码
-    ├── sample_input.jpg  # 测试图片
     └── test_api.html     # Web测试页面
 ```
 
-## 🔧 环境要求
+## 🔧 系统要求
 
-- **操作系统**: Ubuntu 18.04+ / CentOS 7+
-- **Python**: 3.8+
-- **GPU**: NVIDIA GPU (14GB+ VRAM推荐)
-- **存储**: 10GB+ (包含模型文件)
-- **内存**: 8GB+
+### 最低要求
+- **操作系统**: Ubuntu 18.04+ / CentOS 7+ / Windows 10+ (WSL2)
+- **Python**: 3.8 - 3.10
+- **存储**: 2GB+ (包含模型文件)
+- **内存**: 4GB+ RAM
+
+### 推荐配置
+- **操作系统**: Ubuntu 20.04+ / CentOS 8+
+- **Python**: 3.9
+- **GPU**: NVIDIA GPU (8GB+ VRAM)
+- **CUDA**: 11.6+ (推荐11.8)
+- **存储**: 5GB+ (SSD推荐)
+- **内存**: 16GB+ RAM
+
+### 硬件加速
+- **GPU**: 支持CUDA的NVIDIA显卡
+- **显存**: 8GB+ (推荐12GB+)
+- **CPU**: 多核处理器 (GPU加速时CPU要求不高)
 
 ## 📊 性能指标 (GFPGAN一体化处理)
 

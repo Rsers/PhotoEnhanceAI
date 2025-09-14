@@ -52,7 +52,7 @@ async def test_api():
         print()
         
         # Test 3: Image enhancement (if sample image exists)
-        sample_image = Path("examples/sample_input.jpg")
+        sample_image = Path("input/sample_input.jpg")
         if sample_image.exists():
             print("3️⃣ Testing image enhancement...")
             

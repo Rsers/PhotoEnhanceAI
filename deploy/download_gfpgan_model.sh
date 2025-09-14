@@ -1,11 +1,11 @@
 #!/bin/bash
-# PhotoEnhanceAI Model Download Script
-# Downloads required model files for SwinIR and GFPGAN
+# PhotoEnhanceAI - GFPGAN Model Download Script
+# 下载 GFPGAN 模型文件
 
 set -e  # Exit on any error
 
-echo "📦 PhotoEnhanceAI Model Download Started"
-echo "======================================="
+echo "📦 PhotoEnhanceAI - GFPGAN Model Download"
+echo "========================================="
 
 # Color codes for output
 RED='\033[0;31m'
@@ -77,34 +77,13 @@ verify_file() {
     fi
 }
 
-# Create model directories
-mkdir -p models/swinir
+# Create model directory
 mkdir -p models/gfpgan
 
-# Step 1: Download SwinIR model
-print_step "1. Downloading SwinIR model..."
+# Download GFPGAN model
+print_step "1. Downloading GFPGAN model..."
 
-SWINIR_MODEL_URL="https://github.com/JingyunLiang/SwinIR/releases/download/v0.0/001_classicalSR_DIV2K_s48w8_SwinIR-M_x4.pth"
-SWINIR_MODEL_PATH="models/swinir/001_classicalSR_DIV2K_s48w8_SwinIR-M_x4.pth"
-
-if [ -f "$SWINIR_MODEL_PATH" ] && verify_file "$SWINIR_MODEL_PATH" 50 "SwinIR model"; then
-    print_status "SwinIR model already exists and is valid."
-else
-    print_status "Downloading SwinIR model (001_classicalSR_DIV2K_s48w8_SwinIR-M_x4.pth)..."
-    download_file "$SWINIR_MODEL_URL" "$SWINIR_MODEL_PATH" "SwinIR 4x Classical SR Model"
-    
-    if verify_file "$SWINIR_MODEL_PATH" 50 "SwinIR model"; then
-        print_status "✅ SwinIR model downloaded successfully!"
-    else
-        print_error "❌ SwinIR model download failed or file is corrupted."
-        exit 1
-    fi
-fi
-
-# Step 2: Download GFPGAN model
-print_step "2. Downloading GFPGAN model..."
-
-GFPGAN_MODEL_URL="https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.4.pth"
+GFPGAN_MODEL_URL="https://github.com/TencentARC/GFPGAN/releases/download/v1.3.8/GFPGANv1.4.pth"
 GFPGAN_MODEL_PATH="models/gfpgan/GFPGANv1.4.pth"
 
 if [ -f "$GFPGAN_MODEL_PATH" ] && verify_file "$GFPGAN_MODEL_PATH" 300 "GFPGAN model"; then
@@ -121,22 +100,13 @@ else
     fi
 fi
 
-# Step 3: Create model info file
-print_step "3. Creating model information file..."
+# Create model info file
+print_step "2. Creating model information file..."
 
 cat > models/MODEL_INFO.md << EOF
 # PhotoEnhanceAI Model Information
 
 ## Downloaded Models
-
-### SwinIR Model
-- **File**: \`001_classicalSR_DIV2K_s48w8_SwinIR-M_x4.pth\`
-- **Size**: ~57MB
-- **Purpose**: 4x Classical Image Super-Resolution
-- **Architecture**: SwinIR-M (Medium)
-- **Training Dataset**: DIV2K
-- **Window Size**: 8
-- **Patch Size**: 48
 
 ### GFPGAN Model
 - **File**: \`GFPGANv1.4.pth\`
@@ -144,60 +114,50 @@ cat > models/MODEL_INFO.md << EOF
 - **Purpose**: Generative Facial Prior-Guided Face Restoration
 - **Version**: 1.4
 - **Architecture**: GFPGAN with facial component dictionaries
+- **Features**: 
+  - AI人脸修复和美化
+  - RealESRGAN背景超分辨率
+  - 1-16倍分辨率放大
+  - 一体化处理
 
 ## Model Usage
 
-### SwinIR
-- Input: Low-resolution images
-- Output: 4x super-resolved images
-- Best for: General image enhancement, backgrounds, textures
-
 ### GFPGAN
 - Input: Images with faces (any resolution)
-- Output: Face-restored images
+- Output: Face-restored images with super-resolution
 - Best for: Portrait photos, selfies, face enhancement
+- Processing: One-step face restoration + background upscaling
 
 ## File Verification
 
 Run the following commands to verify model integrity:
 
 \`\`\`bash
-# Check SwinIR model
-ls -lh models/swinir/001_classicalSR_DIV2K_s48w8_SwinIR-M_x4.pth
-
 # Check GFPGAN model  
 ls -lh models/gfpgan/GFPGANv1.4.pth
 \`\`\`
 
-Expected sizes:
-- SwinIR: ~57MB
+Expected size:
 - GFPGAN: ~333MB
 
 ## Troubleshooting
 
-If models fail to download:
+If model fails to download:
 1. Check internet connection
 2. Try running the download script again
-3. Manually download from the URLs in download_models.sh
-4. Verify file sizes match expected values
+3. Manually download from: https://github.com/TencentARC/GFPGAN/releases/download/v1.3.8/GFPGANv1.4.pth
+4. Verify file size matches expected value (~333MB)
 
 EOF
 
 print_status "Model information file created."
 
-# Step 4: Final verification
-print_step "4. Final verification..."
+# Final verification
+print_step "3. Final verification..."
 
 echo ""
 print_status "📊 Model Download Summary:"
 echo "----------------------------------------"
-
-if [ -f "$SWINIR_MODEL_PATH" ]; then
-    SWINIR_SIZE=$(du -h "$SWINIR_MODEL_PATH" | cut -f1)
-    echo "✅ SwinIR Model: $SWINIR_SIZE"
-else
-    echo "❌ SwinIR Model: Missing"
-fi
 
 if [ -f "$GFPGAN_MODEL_PATH" ]; then
     GFPGAN_SIZE=$(du -h "$GFPGAN_MODEL_PATH" | cut -f1)
@@ -209,17 +169,20 @@ fi
 echo "----------------------------------------"
 
 # Calculate total size
-if [ -f "$SWINIR_MODEL_PATH" ] && [ -f "$GFPGAN_MODEL_PATH" ]; then
+if [ -f "$GFPGAN_MODEL_PATH" ]; then
     TOTAL_SIZE=$(du -h models/ | tail -1 | cut -f1)
     print_status "Total model size: $TOTAL_SIZE"
     echo ""
-    echo "🎉 All models downloaded successfully!"
+    echo "🎉 GFPGAN model downloaded successfully!"
     echo ""
     print_status "You can now run PhotoEnhanceAI:"
-    echo "python gfpgan_cli.py --input your_image.jpg --output enhanced_image.jpg"
+    echo "python gfpgan_cli.py --input input/your_image.jpg --output output/enhanced.jpg --scale 4"
+    echo ""
+    print_status "Or use the quick start script:"
+    echo "./quick_start.sh"
     echo ""
 else
     echo ""
-    print_error "❌ Some models are missing. Please check the download process."
+    print_error "❌ GFPGAN model is missing. Please check the download process."
     exit 1
 fi
