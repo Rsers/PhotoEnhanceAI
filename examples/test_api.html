@@ -303,16 +303,16 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎨 PhotoEnhanceAI</h1>
-            <p>AI驱动的人像图像增强服务</p>
+            <h1>🎭 PhotoEnhanceAI 2.0</h1>
+            <p>GFPGAN一体化解决方案：人脸修复 + 超分辨率</p>
         </div>
 
         <div class="content">
             <!-- 上传区域 -->
             <div class="upload-section">
                 <div class="upload-area" id="uploadArea">
-                    <div class="icon">📸</div>
-                    <p>拖拽图片到这里或点击选择文件</p>
+                    <div class="icon">🎭</div>
+                    <p>上传图片进行GFPGAN增强 (人脸修复 + 4倍超分辨率)</p>
                     <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
                         选择图片
                     </button>
@@ -332,7 +332,7 @@
                 </div>
 
                 <div class="control-group">
-                    <label for="tileSizeSelect">🔧 处理模式</label>
+                    <label for="tileSizeSelect">🔧 瓦片大小 (影响显存使用)</label>
                     <select id="tileSizeSelect">
                         <option value="256">省显存模式 (256)</option>
                         <option value="400" selected>推荐模式 (400)</option>
@@ -351,7 +351,7 @@
 
             <!-- 结果显示 -->
             <div class="result-section" id="resultSection" style="display: none;">
-                <h2>✨ 处理结果</h2>
+                <h2>🎭 GFPGAN处理结果</h2>
 
                 <div class="stats" id="statsContainer">
                     <div class="stat-item">
@@ -626,12 +626,12 @@
             try {
                 const response = await fetch(`${API_BASE}/health`);
                 if (response.ok) {
-                    showMessage('🟢 API服务连接正常', 'success');
+                    showMessage('🟢 GFPGAN API服务连接正常', 'success');
                 } else {
-                    showMessage('🟡 API服务响应异常', 'error');
+                    showMessage('🟡 GFPGAN API服务响应异常', 'error');
                 }
             } catch (error) {
-                showMessage('🔴 无法连接到API服务，请检查服务是否启动', 'error');
+                showMessage('🔴 无法连接到GFPGAN API服务，请检查服务是否启动', 'error');
             }
         });
     </script>

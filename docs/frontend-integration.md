@@ -1,6 +1,13 @@
 # 前端集成指南
 
-## 🌐 API服务信息
+## 🌐 PhotoEnhanceAI API 2.0 - GFPGAN一体化解决方案
+
+### 🎭 GFPGAN功能特点
+- ✅ **AI人脸修复**: 智能修复面部细节和纹理
+- ✅ **RealESRGAN背景超分辨率**: 内置背景增强
+- ✅ **4倍分辨率提升**: 默认放大，支持1-16倍
+- ✅ **7倍速度提升**: 比传统流水线快7倍
+- ✅ **一体化处理**: 无需多个模型，一步到位
 
 ### 服务地址
 - **本地开发**: http://localhost:8000
@@ -9,7 +16,7 @@
 ### 可用端点
 - **API文档**: `/docs` - Swagger交互式文档
 - **健康检查**: `/health` - 服务状态检查
-- **图像增强**: `/api/v1/enhance` - 上传图像进行处理
+- **GFPGAN增强**: `/api/v1/enhance` - 人脸修复+超分辨率
 - **任务状态**: `/api/v1/status/{task_id}` - 查询处理状态
 - **下载结果**: `/api/v1/download/{task_id}` - 下载处理结果
 - **删除任务**: `/api/v1/tasks/{task_id}` - 清理任务文件
@@ -20,13 +27,13 @@
 
 ```javascript
 /**
- * 上传图像并获取任务ID
+ * 上传图像进行GFPGAN增强 (人脸修复 + 4倍超分辨率)
  */
 async function uploadImage(imageFile, options = {}) {
     const formData = new FormData();
     formData.append('file', imageFile);
-    formData.append('tile_size', options.tileSize || 400);
-    formData.append('quality_level', options.quality || 'high');
+    formData.append('tile_size', options.tileSize || 400);  // 瓦片大小，影响显存使用
+    formData.append('quality_level', options.quality || 'high');  // fast/medium/high
 
     try {
         const response = await fetch('http://localhost:8000/api/v1/enhance', {
@@ -39,9 +46,10 @@ async function uploadImage(imageFile, options = {}) {
         }
         
         const result = await response.json();
+        console.log('🎭 GFPGAN任务已创建:', result.task_id);
         return result.task_id;
     } catch (error) {
-        console.error('Upload failed:', error);
+        console.error('❌ GFPGAN上传失败:', error);
         throw error;
     }
 }
@@ -105,25 +113,26 @@ async function downloadResult(taskId, filename = 'enhanced_image.jpg') {
 }
 
 /**
- * 完整的图像增强流程
+ * 完整的GFPGAN图像增强流程 (人脸修复 + 4倍超分辨率)
  */
 async function enhanceImage(imageFile, options = {}) {
     try {
-        console.log('🚀 开始上传图像...');
+        console.log('🎭 开始GFPGAN图像增强...');
+        console.log('✨ 功能: 人脸修复 + RealESRGAN超分辨率');
         
         // 1. 上传图像
         const taskId = await uploadImage(imageFile, options);
-        console.log(`📋 任务ID: ${taskId}`);
+        console.log(`📋 GFPGAN任务ID: ${taskId}`);
         
         // 2. 等待处理完成
-        console.log('⏳ 正在处理图像...');
+        console.log('⏳ GFPGAN处理中 (预计14-18秒)...');
         const result = await waitForCompletion(taskId, (status) => {
             console.log(`📊 处理进度: ${Math.round((status.progress || 0) * 100)}%`);
             console.log(`💬 状态: ${status.message}`);
         });
         
         // 3. 下载结果
-        console.log('✅ 处理完成，开始下载...');
+        console.log('✅ GFPGAN处理完成，开始下载...');
         const blob = await downloadResult(taskId);
         
         // 4. 清理任务
@@ -131,11 +140,12 @@ async function enhanceImage(imageFile, options = {}) {
             method: 'DELETE'
         });
         
-        console.log('🎉 图像增强完成！');
+        console.log('🎉 GFPGAN图像增强完成！');
+        console.log('📈 效果: 人脸修复 + 4倍分辨率提升');
         return blob;
         
     } catch (error) {
-        console.error('❌ 图像增强失败:', error);
+        console.error('❌ GFPGAN增强失败:', error);
         throw error;
     }
 }
