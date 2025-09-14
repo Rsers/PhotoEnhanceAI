@@ -1,0 +1,29 @@
+# PhotoEnhanceAI API Requirements
+# Web framework and async support
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# File handling
+aiofiles==23.2.1
+python-magic==0.4.27
+
+# Image processing utilities
+Pillow==10.2.0
+
+# Background task processing
+celery==5.3.4
+redis==5.0.1
+
+# Validation and serialization
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# HTTP client for testing
+httpx==0.25.2
+
+# Monitoring and logging
+structlog==23.2.0
+
+# Environment management
+python-dotenv==1.0.0

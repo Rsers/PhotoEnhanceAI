@@ -1,185 +1,300 @@
 # PhotoEnhanceAI 🎨
 
-[![GitHub stars](https://img.shields.io/github/stars/Rsers/PhotoEnhanceAI?style=social)](https://github.com/Rsers/PhotoEnhanceAI)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![CUDA](https://img.shields.io/badge/CUDA-11.6+-green.svg)](https://developer.nvidia.com/cuda-downloads)
+AI驱动的人像图像增强服务，结合SwinIR超分辨率和GFPGAN人脸修复技术，让手机照片达到单反级别的效果。
 
-**AI驱动的人像照片专业增强工具** - 让手机自拍照达到单反相机的专业效果
+## ✨ 特性
 
-## ✨ 核心特性
-
-- 🎯 **反向流水线技术**: SwinIR专业处理 → GFPGAN人脸精修
-- 🚀 **4倍超分辨率**: AI算法实现图像分辨率和质量的显著提升
-- 👤 **智能人脸修复**: 专业级面部细节增强和修复
-- ⚡ **GPU加速**: 支持CUDA加速，处理速度快
-- 🎨 **专业级效果**: 手机照片 → 单反品质
-
-## 🎬 效果展示
-
-| 处理前 | 处理后 | 提升效果 |
-|--------|--------|----------|
-| 0.1-0.7MB | 1.6-10.4MB | 14-18倍文件增长 |
-| 普通清晰度 | 专业级质量 | 4倍分辨率提升 |
-| 手机自拍 | 单反效果 | 面部+整体双重优化 |
+- 🚀 **反向流水线**: SwinIR专业处理 + GFPGAN人脸修复
+- 🎯 **智能优化**: 自动瓦片处理，适应不同GPU显存
+- 🌐 **Web API**: RESTful接口，支持异步处理
+- 📱 **跨平台**: 支持各种前端框架集成
+- ⚡ **高性能**: GPU加速，批量处理支持
 
 ## 🚀 快速开始
-
-### 环境要求
-
-- **操作系统**: Ubuntu 20.04+ / CentOS 7+
-- **Python**: 3.8+
-- **GPU**: NVIDIA GPU with CUDA 11.6+
-- **显存**: 建议8GB以上
-- **存储**: 至少10GB可用空间
 
 ### 一键部署
 
 ```bash
-# 克隆仓库
 git clone https://github.com/Rsers/PhotoEnhanceAI.git
 cd PhotoEnhanceAI
-
-# 运行自动部署脚本
 chmod +x deploy/setup_environment.sh
 ./deploy/setup_environment.sh
-
-# 下载模型文件
 chmod +x models/download_models.sh
 ./models/download_models.sh
+python api/start_server.py
 ```
 
-### 基础使用
+### 手动安装
 
+1. **创建虚拟环境**
 ```bash
-# 激活环境并处理单张图片
-python scripts/reverse_portrait_pipeline.py \
-    --input examples/input.jpg \
-    --output examples/output.jpg \
-    --tile 400
+# SwinIR环境
+python3 -m venv swinir_env
+source swinir_env/bin/activate
+pip install -r requirements/swinir_requirements.txt
+deactivate
+
+# GFPGAN环境  
+python3 -m venv gfpgan_env
+source gfpgan_env/bin/activate
+pip install -r requirements/gfpgan_requirements.txt
+deactivate
+
+# API环境
+python3 -m venv api_env
+source api_env/bin/activate
+pip install -r requirements/api_requirements.txt
+deactivate
 ```
 
-## 📊 处理性能
+2. **下载模型文件**
+```bash
+mkdir -p models/swinir models/gfpgan
 
-### 性能基准测试
+# SwinIR模型 (约200MB)
+wget -O models/swinir/001_classicalSR_DIV2K_s48w8_SwinIR-M_x4.pth \
+  https://github.com/JingyunLiang/SwinIR/releases/download/v0.0/001_classicalSR_DIV2K_s48w8_SwinIR-M_x4.pth
 
-| 输入大小 | 处理时间 | 输出大小 | 增长倍数 | GPU显存占用 |
-|----------|----------|----------|----------|--------------|
-| 0.1MB    | ~48秒    | 1.6MB    | 14.2x    | ~8GB        |
-| 0.3MB    | ~97秒    | 4.8MB    | 16.3x    | ~10GB       |
-| 0.5MB    | ~97秒    | 7.7MB    | 14.4x    | ~12GB       |
-| 0.7MB    | ~136秒   | 10.4MB   | 14.7x    | ~14GB       |
-
-### 质量保证
-
-- ✅ **100%成功率**: 经过8+张不同类型图片验证
-- ✅ **稳定性**: 处理时间和质量提升可预测
-- ✅ **兼容性**: 支持JPG、PNG等主流格式
-
-## 🔧 技术架构
-
-### 核心算法
-
-1. **SwinIR**: 基于Swin Transformer的图像超分辨率网络
-   - 预处理增强 (对比度+锐化)
-   - 4倍AI超分辨率放大
-   - 智能后处理优化 (降噪+细节保护)
-
-2. **GFPGAN**: Generative Facial Prior-Guided Face Restoration
-   - 基于高分辨率图像的人脸检测
-   - AI修复人脸细节和纹理
-   - 保持整体图像优秀效果
-
-### 反向流水线优势
-
-```
-传统方案: 人脸修复 → 整体放大 (面部清晰，背景一般)
-反向流水线: 整体优化 → 人脸精修 (背景优秀，面部精细)
+# GFPGAN模型 (约350MB)  
+wget -O models/gfpgan/GFPGANv1.4.pth \
+  https://github.com/TencentARC/GFPGAN/releases/download/v1.3.8/GFPGANv1.4.pth
 ```
 
-**优势**:
-- 🎯 先建立整体高质量基础
-- 🎨 再进行人脸精细优化
-- ⚖️ 平衡背景和人脸效果
-- ⚡ 处理时间更优化
+3. **启动API服务**
+```bash
+python api/start_server.py
+```
 
-## 📁 项目结构
+## 🌐 API使用
+
+### 基础调用
+
+```javascript
+// 上传图像
+const formData = new FormData();
+formData.append('file', imageFile);
+formData.append('tile_size', 400);
+formData.append('quality_level', 'high');
+
+const response = await fetch('http://localhost:8000/api/v1/enhance', {
+    method: 'POST',
+    body: formData
+});
+
+const result = await response.json();
+const taskId = result.task_id;
+
+// 轮询状态
+while (true) {
+    const statusResponse = await fetch(`http://localhost:8000/api/v1/status/${taskId}`);
+    const status = await statusResponse.json();
+    
+    if (status.status === 'completed') {
+        // 下载结果
+        const downloadResponse = await fetch(`http://localhost:8000/api/v1/download/${taskId}`);
+        const blob = await downloadResponse.blob();
+        break;
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+}
+```
+
+### React Hook
+
+```javascript
+import { useState, useCallback } from 'react';
+
+export function useImageEnhancement() {
+    const [loading, setLoading] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [error, setError] = useState(null);
+
+    const enhanceImage = useCallback(async (file, options = {}) => {
+        setLoading(true);
+        setError(null);
+        setProgress(0);
+
+        try {
+            // 上传、等待、下载逻辑...
+            return blob;
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        } finally {
+            setLoading(false);
+            setProgress(0);
+        }
+    }, []);
+
+    return { enhanceImage, loading, progress, error };
+}
+```
+
+## 🎯 API端点
+
+| 端点 | 方法 | 描述 |
+|------|------|------|
+| `/` | GET | 服务信息 |
+| `/health` | GET | 健康检查 |
+| `/docs` | GET | API文档 |
+| `/api/v1/enhance` | POST | 图像增强 |
+| `/api/v1/status/{task_id}` | GET | 任务状态 |
+| `/api/v1/download/{task_id}` | GET | 下载结果 |
+| `/api/v1/tasks/{task_id}` | DELETE | 删除任务 |
+
+## ⚙️ 配置参数
+
+### 处理参数
+- **tile_size**: 瓦片大小 (256-512)
+  - 256: 省显存模式
+  - 400: 推荐模式 (默认)
+  - 512: 高质量模式
+
+- **quality_level**: 质量等级
+  - fast: 快速处理
+  - medium: 平衡模式
+  - high: 高质量 (默认)
+
+### 文件限制
+- **支持格式**: JPG, JPEG, PNG, BMP, TIFF
+- **最大文件**: 50MB
+- **推荐尺寸**: 1000×1000以下
+
+## 🏗️ 项目结构
 
 ```
 PhotoEnhanceAI/
-├── README.md                   # 项目说明
-├── requirements/              # 依赖管理
+├── api/                    # Web API服务
+│   ├── main.py            # FastAPI应用
+│   ├── start_server.py    # 服务启动脚本
+│   └── test_client.py     # API测试客户端
+├── config/                # 配置文件
+│   └── settings.py        # API配置
+├── scripts/               # 核心处理脚本
+│   ├── reverse_portrait_pipeline.py  # 反向流水线
+│   ├── social_media_upscale.py      # SwinIR处理
+│   └── inference_gfpgan.py          # GFPGAN推理
+├── deploy/                # 部署脚本
+│   ├── setup_environment.sh        # 环境安装
+│   └── production_setup.sh         # 生产部署
+├── models/                # AI模型文件
+│   ├── download_models.sh # 模型下载脚本
+│   ├── swinir/           # SwinIR模型
+│   └── gfpgan/           # GFPGAN模型
+├── requirements/          # 依赖文件
 │   ├── swinir_requirements.txt
 │   ├── gfpgan_requirements.txt
-│   └── common_requirements.txt
-├── scripts/                   # 核心脚本
-│   ├── reverse_portrait_pipeline.py  # 主处理脚本
-│   ├── social_media_upscale.py      # SwinIR处理
-│   └── inference_gfpgan.py          # GFPGAN处理
-├── models/                    # 模型管理
-│   ├── download_models.sh     # 模型下载脚本
-│   └── README.md             # 模型说明
-├── config/                    # 配置文件
-├── deploy/                    # 部署脚本
-│   ├── setup_environment.sh  # 环境配置
-│   └── install_dependencies.sh
-├── api/                       # API接口 (开发中)
-├── docs/                      # 详细文档
-├── tests/                     # 测试用例
-└── examples/                  # 示例文件
+│   └── api_requirements.txt
+├── docs/                  # 文档
+│   ├── deployment.md      # 部署指南
+│   ├── frontend-integration.md  # 前端集成
+│   └── api.md            # API文档
+└── examples/             # 示例代码
+    ├── sample_input.jpg  # 测试图片
+    └── test_api.html     # Web测试页面
 ```
 
-## 🌐 API接口 (开发中)
+## 🔧 环境要求
 
-### 计划功能
+- **操作系统**: Ubuntu 18.04+ / CentOS 7+
+- **Python**: 3.8+
+- **GPU**: NVIDIA GPU (14GB+ VRAM推荐)
+- **存储**: 10GB+ (包含模型文件)
+- **内存**: 8GB+
 
-- **RESTful API**: 支持HTTP请求调用
-- **批量处理**: 支持多张图片同时处理
-- **异步队列**: 长时间任务后台处理
-- **Web界面**: 浏览器直接使用
+## 📊 性能指标
 
-```python
-# 计划的API接口
-POST /api/v1/enhance/portrait
-GET  /api/v1/status
-POST /api/v1/batch/enhance
+| 图片尺寸 | 处理时间 | 显存占用 | 推荐配置 |
+|----------|----------|----------|----------|
+| 512×512 | 5-10秒 | 2-4GB | tile_size=512 |
+| 1024×1024 | 15-30秒 | 6-10GB | tile_size=400 |
+| 2048×2048 | 45-90秒 | 12-16GB | tile_size=256 |
+
+## 🚀 生产部署
+
+### Docker部署 (推荐)
+
+```bash
+# 构建镜像
+docker build -t photoenhanceai .
+
+# 运行容器
+docker run -d \
+  --name photoenhanceai \
+  --gpus all \
+  -p 8000:8000 \
+  -v /data/models:/app/models \
+  photoenhanceai
 ```
 
-## 📖 详细文档
+### 系统服务部署
 
-- [部署指南](docs/deployment.md) - 详细的部署步骤和环境配置
-- [使用教程](docs/usage.md) - 完整的使用说明和参数调优
-- [API文档](docs/api.md) - API接口详细说明 (开发中)
-- [性能分析](docs/performance.md) - 详细的性能测试和优化建议
-- [故障排除](docs/troubleshooting.md) - 常见问题和解决方案
+```bash
+# 执行生产部署脚本
+sudo chmod +x deploy/production_setup.sh
+sudo ./deploy/production_setup.sh
+
+# 服务管理
+sudo supervisorctl status photoenhanceai
+sudo supervisorctl restart photoenhanceai
+```
+
+## 🔍 故障排除
+
+### 常见问题
+
+1. **CUDA内存不足**
+   - 降低tile_size参数
+   - 使用quality_level="fast"
+   - 关闭其他GPU程序
+
+2. **模型加载失败**
+   - 检查模型文件完整性
+   - 重新下载模型文件
+   - 验证文件路径正确
+
+3. **API连接超时**
+   - 增加请求超时时间
+   - 检查网络连接
+   - 验证服务端口开放
+
+### 性能优化
+
+1. **服务器端**
+   - 使用SSD存储
+   - 增加系统内存
+   - 优化GPU驱动
+
+2. **客户端**
+   - 图片预压缩
+   - 批量处理
+   - 缓存结果
 
 ## 🤝 贡献指南
 
-欢迎贡献代码、报告问题或提出改进建议！
-
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 打开 Pull Request
+1. Fork项目
+2. 创建特性分支
+3. 提交更改
+4. 推送到分支
+5. 创建Pull Request
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+本项目基于MIT许可证开源 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
 ## 🙏 致谢
 
-- [SwinIR](https://github.com/JingyunLiang/SwinIR) - 优秀的图像超分辨率算法
-- [GFPGAN](https://github.com/TencentARC/GFPGAN) - 强大的人脸修复技术
-- 所有为开源AI社区做出贡献的开发者们
+- [SwinIR](https://github.com/JingyunLiang/SwinIR) - 图像超分辨率
+- [GFPGAN](https://github.com/TencentARC/GFPGAN) - 人脸修复技术
+- [FastAPI](https://fastapi.tiangolo.com/) - 现代Web框架
 
-## 📞 联系方式
+## 📞 支持
 
-- **GitHub Issues**: [报告问题](https://github.com/Rsers/PhotoEnhanceAI/issues)
-- **讨论**: [GitHub Discussions](https://github.com/Rsers/PhotoEnhanceAI/discussions)
+- 📧 Email: support@photoenhanceai.com
+- 💬 Issues: [GitHub Issues](https://github.com/Rsers/PhotoEnhanceAI/issues)
+- 📖 文档: [项目Wiki](https://github.com/Rsers/PhotoEnhanceAI/wiki)
 
 ---
 
-**让每一张照片都达到专业级别的效果！** ✨
-
-如果这个项目对你有帮助，请给个 ⭐ Star 支持一下！
+⭐ 如果这个项目对你有帮助，请给个Star支持一下！
