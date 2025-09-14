@@ -214,7 +214,7 @@ async def enhance_portrait(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     tile_size: int = Query(400, ge=256, le=512, description="Tile size for processing (256-512)"),
-    quality_level: str = Query("high", regex="^(fast|medium|high)$", description="Quality level")
+    quality_level: str = Query("high", pattern="^(fast|medium|high)$", description="Quality level")
 ):
     """
     使用GFPGAN增强图像 (人脸修复 + 超分辨率)
