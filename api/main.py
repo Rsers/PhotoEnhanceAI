@@ -115,8 +115,8 @@ async def process_image_task(task_id: str, input_path: str, output_path: str, ti
         # Import processing module (lazy import to avoid startup issues)
         import subprocess
         
-        # Prepare command - 使用新的GFPGAN单独处理脚本
-        script_path = PROJECT_ROOT / "scripts" / "gfpgan_enhance.py"
+        # Prepare command - 使用现有的GFPGAN命令行工具
+        script_path = PROJECT_ROOT / "gfpgan_cli.py"
         
         # 根据质量等级设置参数
         quality_map = {

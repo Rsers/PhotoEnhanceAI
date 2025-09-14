@@ -158,29 +158,27 @@ def main():
             temp_cropped_faces = os.path.join(temp_dir, "cropped_faces")
             temp_cmp = os.path.join(temp_dir, "cmp")
             
-            # 只移动完整的增强图像到输出目录
+            # 直接移动增强图像到API指定的输出路径
             if os.path.exists(temp_restored_imgs):
                 for file in os.listdir(temp_restored_imgs):
                     if file.endswith('.jpg') and 'enhanced' in file:
                         src_file = os.path.join(temp_restored_imgs, file)
-                        dst_file = os.path.join(output_dir, file)
+                        dst_file = args.output  # 直接输出到API指定的确切路径
                         # 如果目标文件已存在，先删除
                         if os.path.exists(dst_file):
                             os.remove(dst_file)
                         shutil.move(src_file, dst_file)
                         break
             
-            # 查找生成的文件
-            enhanced_files = [f for f in os.listdir(output_dir) if f.endswith('.jpg') and 'enhanced' in f]
-            
-            if enhanced_files:
-                enhanced_file = os.path.join(output_dir, enhanced_files[0])
+            # 检查文件是否成功输出到指定路径
+            if os.path.exists(args.output):
+                enhanced_file = args.output
                 output_size = os.path.getsize(enhanced_file) / (1024 * 1024)  # MB
                 input_size = os.path.getsize(args.input) / (1024 * 1024)  # MB
                 
                 print("📊 处理结果:")
                 print(f"├─ 输入文件: {os.path.basename(args.input)} ({input_size:.1f}MB)")
-                print(f"├─ 输出文件: {enhanced_files[0]} ({output_size:.1f}MB)")
+                print(f"├─ 输出文件: {os.path.basename(args.output)} ({output_size:.1f}MB)")
                 print(f"├─ 处理时间: {processing_time:.1f}秒")
                 print(f"├─ 放大倍数: {args.scale}x")
                 print(f"└─ 文件增长: {output_size/input_size:.1f}x")
