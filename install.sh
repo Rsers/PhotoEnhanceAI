@@ -80,8 +80,8 @@ print_step "2. Installing system dependencies..."
 
 if command -v apt-get &> /dev/null; then
     print_status "Installing packages for Ubuntu/Debian..."
-    sudo apt-get update -qq
-    sudo apt-get install -y -qq \
+    apt-get update -qq
+    apt-get install -y -qq \
         python3-venv \
         python3-dev \
         python3-pip \
@@ -98,10 +98,10 @@ if command -v apt-get &> /dev/null; then
         cmake
 elif command -v yum &> /dev/null; then
     print_status "Installing packages for CentOS/RHEL..."
-    sudo yum install -y python3-devel python3-pip mesa-libGL gcc git wget curl cmake
+    yum install -y python3-devel python3-pip mesa-libGL gcc git wget curl cmake
 elif command -v dnf &> /dev/null; then
     print_status "Installing packages for Fedora..."
-    sudo dnf install -y python3-devel python3-pip mesa-libGL gcc git wget curl cmake
+    dnf install -y python3-devel python3-pip mesa-libGL gcc git wget curl cmake
 else
     print_warning "Package manager not recognized. Please install dependencies manually:"
     echo "  - python3-venv python3-dev python3-pip"

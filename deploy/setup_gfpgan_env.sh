@@ -81,8 +81,8 @@ print_step "2. Installing system dependencies..."
 
 if command -v apt-get &> /dev/null; then
     print_status "Installing system packages (Ubuntu/Debian)..."
-    sudo apt-get update -qq
-    sudo apt-get install -y -qq \
+    apt-get update -qq
+    apt-get install -y -qq \
         python3-venv \
         python3-dev \
         libgl1-mesa-glx \
@@ -97,7 +97,7 @@ if command -v apt-get &> /dev/null; then
         build-essential
 elif command -v yum &> /dev/null; then
     print_status "Installing system packages (CentOS/RHEL)..."
-    sudo yum install -y python3-devel mesa-libGL gcc git wget curl
+    yum install -y python3-devel mesa-libGL gcc git wget curl
 else
     print_warning "Package manager not recognized. Please install system dependencies manually."
 fi

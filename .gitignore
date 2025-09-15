@@ -106,8 +106,10 @@ examples/*.jpeg
 !examples/sample_*.png
 
 # Processing directories (generated content)
-input/
-output/
+input/*
+!input/test001.jpg
+output/*
+!output/.gitkeep
 **/.trash/
 
 # Temporary log files

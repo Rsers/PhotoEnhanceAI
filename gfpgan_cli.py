@@ -108,7 +108,7 @@ def main():
     print()
     
     # 检查环境
-    gfpgan_env = "/root/gfpgan_env"
+    gfpgan_env = "/root/PhotoEnhanceAI/gfpgan_env"
     project_dir = "/root/PhotoEnhanceAI"
     
     if not os.path.exists(gfpgan_env):

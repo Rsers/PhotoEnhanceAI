@@ -41,6 +41,16 @@ print_status "PhotoEnhanceAI - 快速图像增强工具"
 echo "=================================="
 echo ""
 
+# Check if virtual environment exists
+GFPGAN_ENV="/root/PhotoEnhanceAI/gfpgan_env"
+if [ ! -d "$GFPGAN_ENV" ]; then
+    print_error "GFPGAN虚拟环境不存在: $GFPGAN_ENV"
+    print_error "请先运行 ./install.sh 安装环境"
+    exit 1
+fi
+
+print_status "✅ 检测到GFPGAN虚拟环境: $GFPGAN_ENV"
+
 # Default input file
 DEFAULT_INPUT="PhotoEnhanceAI/input/test001.jpg"
 
@@ -191,6 +201,8 @@ show_progress() {
 TEMP_LOG="/tmp/gfpgan_process.log"
 
 # Run the GFPGAN CLI in background with output redirected
+# Activate virtual environment before running
+source "$GFPGAN_ENV/bin/activate" && \
 python /root/PhotoEnhanceAI/gfpgan_cli.py \
     --input "$INPUT_FILE" \
     --output "$OUTPUT_FILE" \

@@ -87,13 +87,13 @@ check_item "Deploy directory exists" "[ -d 'deploy' ]"
 # Step 3: Check virtual environment
 print_step "3. Checking virtual environment..."
 
-check_item "GFPGAN environment exists" "[ -d '/root/gfpgan_env' ]"
+check_item "GFPGAN environment exists" "[ -d '/root/PhotoEnhanceAI/gfpgan_env' ]"
 
 # Step 4: Check Python packages
 print_step "4. Checking Python packages..."
 
-if [ -d "/root/gfpgan_env" ]; then
-    source /root/gfpgan_env/bin/activate
+if [ -d "/root/PhotoEnhanceAI/gfpgan_env" ]; then
+    source /root/PhotoEnhanceAI/gfpgan_env/bin/activate
     
     check_item "PyTorch installed" "python -c 'import torch'"
     check_item "GFPGAN installed" "python -c 'import gfpgan'"
@@ -123,8 +123,8 @@ check_item "Install script exists" "[ -f 'install.sh' ]"
 print_step "7. Testing functionality..."
 
 # Check if we can import the main modules
-if [ -d "/root/gfpgan_env" ]; then
-    source /root/gfpgan_env/bin/activate
+if [ -d "/root/PhotoEnhanceAI/gfpgan_env" ]; then
+    source /root/PhotoEnhanceAI/gfpgan_env/bin/activate
     
     check_item "GFPGAN CLI help works" "python gfpgan_cli.py --help"
     
