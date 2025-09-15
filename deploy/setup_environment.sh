@@ -100,36 +100,6 @@ print_step "3. Creating virtual environments..."
 
 cd "$PROJECT_DIR"
 
-# Create SwinIR environment
-print_status "Creating SwinIR environment..."
-if [ -d "swinir_env" ]; then
-    print_warning "SwinIR environment already exists. Removing..."
-    rm -rf swinir_env
-fi
-
-python3 -m venv swinir_env
-source swinir_env/bin/activate
-
-# Upgrade pip
-pip install --upgrade pip
-
-# Install SwinIR requirements
-print_status "Installing SwinIR dependencies..."
-if [ -f "requirements/swinir_requirements.txt" ]; then
-    # Install PyTorch with CUDA support
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-    
-    # Install other requirements
-    pip install opencv-python Pillow numpy scikit-image tqdm pyyaml scipy matplotlib
-    
-    print_status "SwinIR environment setup completed."
-else
-    print_error "SwinIR requirements file not found!"
-    exit 1
-fi
-
-deactivate
-
 # Create GFPGAN environment
 print_status "Creating GFPGAN environment..."
 if [ -d "gfpgan_env" ]; then
@@ -155,6 +125,17 @@ if [ -f "requirements/gfpgan_requirements.txt" ]; then
     pip install scipy numba tb-nightly future filterpy matplotlib
     
     print_status "GFPGAN environment setup completed."
+    
+    # Install API dependencies
+    print_status "Installing API dependencies..."
+    if [ -f "requirements/api_requirements.txt" ]; then
+        pip install -r requirements/api_requirements.txt
+        print_status "API dependencies installed successfully."
+    else
+        print_warning "API requirements file not found. Installing core API dependencies..."
+        pip install fastapi==0.104.1 uvicorn[standard]==0.24.0 python-multipart==0.0.6 aiofiles==23.2.1 pydantic==2.5.0
+        print_status "Core API dependencies installed."
+    fi
 else
     print_error "GFPGAN requirements file not found!"
     exit 1
@@ -165,7 +146,6 @@ deactivate
 # Step 4: Create necessary directories
 print_step "4. Creating project directories..."
 
-mkdir -p models/swinir
 mkdir -p models/gfpgan
 mkdir -p examples
 mkdir -p results
@@ -184,11 +164,9 @@ import os
 
 # Project paths
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SWINIR_ENV_PATH = os.path.join(PROJECT_ROOT, 'swinir_env')
 GFPGAN_ENV_PATH = os.path.join(PROJECT_ROOT, 'gfpgan_env')
 
 # Model paths
-SWINIR_MODEL_PATH = os.path.join(PROJECT_ROOT, 'models/swinir/001_classicalSR_DIV2K_s48w8_SwinIR-M_x4.pth')
 GFPGAN_MODEL_PATH = os.path.join(PROJECT_ROOT, 'models/gfpgan/GFPGANv1.4.pth')
 
 # Processing settings
@@ -206,14 +184,6 @@ print_status "Configuration file created."
 # Step 6: Create activation script
 print_step "6. Creating convenience scripts..."
 
-# Create activation script for SwinIR
-cat > activate_swinir.sh << 'EOF'
-#!/bin/bash
-echo "🎨 Activating SwinIR environment..."
-source swinir_env/bin/activate
-echo "✅ SwinIR environment activated. Use 'deactivate' to exit."
-EOF
-
 # Create activation script for GFPGAN
 cat > activate_gfpgan.sh << 'EOF'
 #!/bin/bash
@@ -222,17 +192,12 @@ source gfpgan_env/bin/activate
 echo "✅ GFPGAN environment activated. Use 'deactivate' to exit."
 EOF
 
-chmod +x activate_swinir.sh activate_gfpgan.sh
+chmod +x activate_gfpgan.sh
 
 # Create quick test script
 cat > test_installation.sh << 'EOF'
 #!/bin/bash
 echo "🧪 Testing PhotoEnhanceAI installation..."
-
-echo "Testing SwinIR environment..."
-source swinir_env/bin/activate
-python -c "import torch; print(f'SwinIR - PyTorch: {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
-deactivate
 
 echo "Testing GFPGAN environment..."
 source gfpgan_env/bin/activate
@@ -258,7 +223,6 @@ echo "3. Process your first image:"
 echo "   python gfpgan_cli.py --input your_image.jpg --output enhanced_image.jpg"
 echo ""
 print_status "Environment activation:"
-echo "- SwinIR: source swinir_env/bin/activate"
 echo "- GFPGAN: source gfpgan_env/bin/activate"
 echo ""
 print_warning "Note: Make sure to download the model files before processing images!"

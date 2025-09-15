@@ -11,11 +11,9 @@ class APISettings:
     
     # Project paths
     PROJECT_ROOT = Path(__file__).parent.parent
-    SWINIR_ENV_PATH = PROJECT_ROOT / 'swinir_env'
     GFPGAN_ENV_PATH = PROJECT_ROOT / 'gfpgan_env'
     
     # Model paths
-    SWINIR_MODEL_PATH = PROJECT_ROOT / 'models/swinir/001_classicalSR_DIV2K_s48w8_SwinIR-M_x4.pth'
     GFPGAN_MODEL_PATH = PROJECT_ROOT / 'models/gfpgan/GFPGANv1.4.pth'
     
     # File handling settings
@@ -53,25 +51,12 @@ class APISettings:
     
     def validate_models(self) -> bool:
         """Check if required model files exist"""
-        return (
-            self.SWINIR_MODEL_PATH.exists() and 
-            self.GFPGAN_MODEL_PATH.exists()
-        )
+        return self.GFPGAN_MODEL_PATH.exists()
     
     def get_model_info(self) -> dict:
         """Get model file information"""
         info = {}
         
-        if self.SWINIR_MODEL_PATH.exists():
-            size = self.SWINIR_MODEL_PATH.stat().st_size / (1024 * 1024)  # MB
-            info['swinir'] = {
-                'path': str(self.SWINIR_MODEL_PATH),
-                'size_mb': round(size, 1),
-                'exists': True
-            }
-        else:
-            info['swinir'] = {'exists': False}
-            
         if self.GFPGAN_MODEL_PATH.exists():
             size = self.GFPGAN_MODEL_PATH.stat().st_size / (1024 * 1024)  # MB
             info['gfpgan'] = {
