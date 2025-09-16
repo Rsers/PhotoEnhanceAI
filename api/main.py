@@ -28,6 +28,9 @@ sys.path.append(str(PROJECT_ROOT))
 # Import configuration
 from config.settings import APISettings
 
+# Import model manager
+from model_manager import model_manager
+
 # Initialize FastAPI app
 app = FastAPI(
     title="PhotoEnhanceAI API",
@@ -102,71 +105,37 @@ def validate_image_file(file: UploadFile) -> None:
             )
 
 async def process_image_task(task_id: str, input_path: str, output_path: str, tile_size: int):
-    """Background task for image processing"""
+    """Background task for image processing using resident model"""
     try:
         # Update task status
         tasks_storage[task_id].update({
             'status': 'processing',
-            'message': 'Starting image enhancement...',
+            'message': '使用常驻模型处理中...',
             'updated_at': time.time(),
             'progress': 0.1
         })
         
-        # Import processing module (lazy import to avoid startup issues)
-        import subprocess
-        
-        # Prepare command - 使用现有的GFPGAN命令行工具
-        script_path = PROJECT_ROOT / "gfpgan_core.py"
-        
-        # 根据质量等级设置参数
-        quality_map = {
-            "fast": "fast",
-            "medium": "balanced", 
-            "high": "high"
-        }
-        quality = quality_map.get(tasks_storage[task_id].get('quality_level', 'high'), 'high')
-        
-        cmd = [
-            "python", str(script_path),
-            "--input", input_path,
-            "--output", output_path,
-            "--scale", "4",  # 默认4倍放大
-            "--quality", quality,
-            "--tile-size", str(tile_size)
-        ]
-        
         # Update progress
         tasks_storage[task_id].update({
             'progress': 0.3,
-            'message': 'GFPGAN处理中 (人脸修复 + 超分辨率)...',
+            'message': 'GFPGAN常驻模型处理中 (人脸修复 + 超分辨率)...',
             'updated_at': time.time()
         })
         
-        # Execute processing
+        # Execute processing using resident model
         start_time = time.time()
-        result = subprocess.run(cmd, capture_output=True, text=True, cwd=PROJECT_ROOT)
+        await model_manager.enhance_image(input_path, output_path, tile_size)
         processing_time = time.time() - start_time
         
-        if result.returncode == 0:
-            # Success
-            tasks_storage[task_id].update({
-                'status': 'completed',
-                'message': 'GFPGAN图像增强完成 (人脸修复 + 4倍超分辨率)',
-                'progress': 1.0,
-                'result_url': f"/api/v1/download/{task_id}",
-                'updated_at': time.time(),
-                'processing_time': processing_time
-            })
-        else:
-            # Error
-            error_msg = result.stderr or "Unknown processing error"
-            tasks_storage[task_id].update({
-                'status': 'failed',
-                'message': 'GFPGAN图像增强失败',
-                'error': error_msg,
-                'updated_at': time.time(),
-                'processing_time': processing_time
-            })
+        # Success
+        tasks_storage[task_id].update({
+            'status': 'completed',
+            'message': 'GFPGAN图像增强完成 (人脸修复 + 4倍超分辨率)',
+            'progress': 1.0,
+            'result_url': f"/api/v1/download/{task_id}",
+            'updated_at': time.time(),
+            'processing_time': processing_time
+        })
             
     except Exception as e:
         # Unexpected error
@@ -203,10 +172,16 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
+    model_info = model_manager.get_model_info()
     return {
         "status": "healthy",
         "timestamp": time.time(),
-        "active_tasks": len([t for t in tasks_storage.values() if t['status'] == 'processing'])
+        "active_tasks": len([t for t in tasks_storage.values() if t['status'] == 'processing']),
+        "model_status": {
+            "initialized": model_info["initialized"],
+            "cuda_available": model_info["cuda_available"],
+            "device": model_info["device"]
+        }
     }
 
 @app.post("/api/v1/enhance", response_model=TaskResponse)
@@ -260,7 +235,7 @@ async def enhance_portrait(
         tasks_storage[task_id] = {
             'task_id': task_id,
             'status': 'queued',
-            'message': 'GFPGAN任务排队中',
+            'message': 'GFPGAN任务排队中 (使用常驻模型)',
             'progress': 0.0,
             'created_at': current_time,
             'updated_at': current_time,
@@ -284,7 +259,7 @@ async def enhance_portrait(
         return TaskResponse(
             task_id=task_id,
             status="queued",
-            message="GFPGAN任务排队中",
+            message="GFPGAN任务排队中 (使用常驻模型)",
             created_at=current_time
         )
         
