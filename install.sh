@@ -167,7 +167,7 @@ Place your images here for processing.
 cp /path/to/your/image.jpg input/my_image.jpg
 
 # Process the image
-python PhotoEnhanceAI/gfpgan_cli.py --input PhotoEnhanceAI/input/my_image.jpg --output PhotoEnhanceAI/output/enhanced.jpg --scale 4
+python PhotoEnhanceAI/gfpgan_core.py --input PhotoEnhanceAI/input/my_image.jpg --output PhotoEnhanceAI/output/enhanced.jpg --scale 4
 
 # Or use quick start (if you rename your image to test001.jpg)
 ./quick_start.sh
@@ -193,7 +193,7 @@ echo "1. Place your image in input/ directory:"
 echo "   cp /path/to/your/image.jpg input/my_image.jpg"
 echo ""
 echo "2. Process the image:"
-echo "   python PhotoEnhanceAI/gfpgan_cli.py --input PhotoEnhanceAI/input/my_image.jpg --output PhotoEnhanceAI/output/enhanced.jpg --scale 4"
+echo "   python PhotoEnhanceAI/gfpgan_core.py --input PhotoEnhanceAI/input/my_image.jpg --output PhotoEnhanceAI/output/enhanced.jpg --scale 4"
 echo ""
 echo "3. Or use the quick start script:"
 echo "   cp /path/to/your/image.jpg input/test001.jpg"
@@ -201,8 +201,8 @@ echo "   ./quick_start.sh"
 echo ""
 
 print_status "Available commands:"
-echo "• python PhotoEnhanceAI/gfpgan_cli.py --help          # Show command line options"
-echo "• python PhotoEnhanceAI/gfpgan_cli.py --input PhotoEnhanceAI/input/test001.jpg --output PhotoEnhanceAI/output/test001_enhanced.jpg --scale 4  # Test with sample image"
+echo "• python PhotoEnhanceAI/gfpgan_core.py --help          # Show command line options"
+echo "• python PhotoEnhanceAI/gfpgan_core.py --input PhotoEnhanceAI/input/test001.jpg --output PhotoEnhanceAI/output/test001_enhanced.jpg --scale 4  # Test with sample image"
 echo "• ./start_api.sh                              # Start Web API service"
 echo "• source /root/gfpgan_env/bin/activate        # Activate environment manually"
 echo ""

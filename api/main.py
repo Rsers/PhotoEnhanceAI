@@ -116,7 +116,7 @@ async def process_image_task(task_id: str, input_path: str, output_path: str, ti
         import subprocess
         
         # Prepare command - 使用现有的GFPGAN命令行工具
-        script_path = PROJECT_ROOT / "gfpgan_cli.py"
+        script_path = PROJECT_ROOT / "gfpgan_core.py"
         
         # 根据质量等级设置参数
         quality_map = {

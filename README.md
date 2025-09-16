@@ -58,7 +58,7 @@ chmod +x deploy/download_gfpgan_model.sh
 ./test_installation.sh
 
 # 处理测试图片
-python gfpgan_cli.py --input input/test001.jpg --output output/enhanced.jpg --scale 4
+python gfpgan_core.py --input input/test001.jpg --output output/enhanced.jpg --scale 4
 ```
 
 ## 🌐 API使用

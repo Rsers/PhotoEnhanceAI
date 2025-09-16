@@ -4,7 +4,7 @@ PhotoEnhanceAI - GFPGAN 命令行工具
 独立的 GFPGAN 图像增强命令行接口
 
 使用方法:
-python PhotoEnhanceAI/gfpgan_cli.py --input PhotoEnhanceAI/input/test001.jpg --output PhotoEnhanceAI/output/test001_enhanced.jpg --scale 4
+python PhotoEnhanceAI/gfpgan_core.py --input PhotoEnhanceAI/input/test001.jpg --output PhotoEnhanceAI/output/test001_enhanced.jpg --scale 4
 """
 
 import argparse
@@ -32,8 +32,8 @@ def main():
   🎯 效果: 人脸+背景同步优化
 
 使用示例:
-  python PhotoEnhanceAI/gfpgan_cli.py --input PhotoEnhanceAI/input/test001.jpg --output PhotoEnhanceAI/output/test001_enhanced.jpg --scale 4
-  python PhotoEnhanceAI/gfpgan_cli.py --input PhotoEnhanceAI/input/test001.jpg --output PhotoEnhanceAI/output/test001_enhanced.jpg --scale 2 --quality fast
+  python PhotoEnhanceAI/gfpgan_core.py --input PhotoEnhanceAI/input/test001.jpg --output PhotoEnhanceAI/output/test001_enhanced.jpg --scale 4
+  python PhotoEnhanceAI/gfpgan_core.py --input PhotoEnhanceAI/input/test001.jpg --output PhotoEnhanceAI/output/test001_enhanced.jpg --scale 2 --quality fast
         """
     )
     

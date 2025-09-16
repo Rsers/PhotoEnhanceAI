@@ -176,7 +176,7 @@ if [ -f "$GFPGAN_MODEL_PATH" ]; then
     echo "🎉 GFPGAN model downloaded successfully!"
     echo ""
     print_status "You can now run PhotoEnhanceAI:"
-    echo "python gfpgan_cli.py --input input/your_image.jpg --output output/enhanced.jpg --scale 4"
+    echo "python gfpgan_core.py --input input/your_image.jpg --output output/enhanced.jpg --scale 4"
     echo ""
     print_status "Or use the quick start script:"
     echo "./quick_start.sh"

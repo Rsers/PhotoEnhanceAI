@@ -91,10 +91,10 @@ chmod +x deploy/download_gfpgan_model.sh
 
 ```bash
 # 基本用法
-python gfpgan_cli.py --input input/your_image.jpg --output output/enhanced.jpg --scale 4
+python gfpgan_core.py --input input/your_image.jpg --output output/enhanced.jpg --scale 4
 
 # 查看所有选项
-python gfpgan_cli.py --help
+python gfpgan_core.py --help
 
 # 快速开始（使用测试图片）
 ./quick_start.sh
@@ -112,13 +112,13 @@ python gfpgan_cli.py --help
 
 ```bash
 # 4倍放大，高质量
-python gfpgan_cli.py --input input/photo.jpg --output output/enhanced.jpg --scale 4 --quality high
+python gfpgan_core.py --input input/photo.jpg --output output/enhanced.jpg --scale 4 --quality high
 
 # 2倍放大，快速处理
-python gfpgan_cli.py --input input/photo.jpg --output output/enhanced.jpg --scale 2 --quality fast
+python gfpgan_core.py --input input/photo.jpg --output output/enhanced.jpg --scale 2 --quality fast
 
 # 自定义瓦片大小
-python gfpgan_cli.py --input input/photo.jpg --output output/enhanced.jpg --scale 4 --tile-size 512
+python gfpgan_core.py --input input/photo.jpg --output output/enhanced.jpg --scale 4 --tile-size 512
 ```
 
 ## 📁 项目结构
@@ -138,7 +138,7 @@ PhotoEnhanceAI/
 ├── api/                      # Web API服务
 ├── deploy/                   # 部署脚本
 ├── docs/                     # 文档
-├── gfpgan_cli.py            # 独立命令行工具
+├── gfpgan_core.py            # 独立命令行工具
 ├── test_gfpgan.py           # 测试脚本
 ├── install.sh               # 一键安装脚本
 ├── verify_deployment.sh     # 部署验证脚本
@@ -179,10 +179,10 @@ wget -O models/gfpgan/GFPGANv1.4.pth \
 #### 4. 内存不足
 ```bash
 # 使用较小的瓦片大小
-python gfpgan_cli.py --input input/photo.jpg --output output/enhanced.jpg --scale 4 --tile-size 256
+python gfpgan_core.py --input input/photo.jpg --output output/enhanced.jpg --scale 4 --tile-size 256
 
 # 或使用快速模式
-python gfpgan_cli.py --input input/photo.jpg --output output/enhanced.jpg --scale 4 --quality fast
+python gfpgan_core.py --input input/photo.jpg --output output/enhanced.jpg --scale 4 --quality fast
 ```
 
 ### 性能优化
@@ -242,7 +242,7 @@ git pull origin main
 ### 快速测试
 ```bash
 # 使用测试图片
-python gfpgan_cli.py --input input/test001.jpg --output output/test001_enhanced.jpg --scale 4
+python gfpgan_core.py --input input/test001.jpg --output output/test001_enhanced.jpg --scale 4
 
 # 查看结果
 ls -la output/

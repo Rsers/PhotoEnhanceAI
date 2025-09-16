@@ -196,7 +196,7 @@ fi
 # Run GFPGAN processing
 echo "🎨 Processing image with GFPGAN..."
 source gfpgan_env/bin/activate
-python gfpgan_cli.py --input input/test001.jpg --output output/test001_enhanced.jpg --scale 4
+python gfpgan_core.py --input input/test001.jpg --output output/test001_enhanced.jpg --scale 4
 deactivate
 
 echo "✅ Processing completed! Check output/ directory for results."
@@ -249,7 +249,7 @@ echo "4. Run processing: ./quick_start.sh"
 echo ""
 print_status "Manual processing:"
 echo "source gfpgan_env/bin/activate"
-echo "python gfpgan_cli.py --input input/your_image.jpg --output output/enhanced.jpg --scale 4"
+echo "python gfpgan_core.py --input input/your_image.jpg --output output/enhanced.jpg --scale 4"
 echo ""
 print_warning "Note: Make sure to download the GFPGAN model before processing images!"
 echo ""

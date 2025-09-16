@@ -203,7 +203,7 @@ TEMP_LOG="/tmp/gfpgan_process.log"
 # Run the GFPGAN CLI in background with output redirected
 # Activate virtual environment before running
 source "$GFPGAN_ENV/bin/activate" && \
-python /root/PhotoEnhanceAI/gfpgan_cli.py \
+python /root/PhotoEnhanceAI/gfpgan_core.py \
     --input "$INPUT_FILE" \
     --output "$OUTPUT_FILE" \
     --scale 4 > "$TEMP_LOG" 2>&1 &

@@ -30,7 +30,7 @@ def test_gfpgan():
     try:
         cmd = [
             "bash", "-c",
-            f"source {gfpgan_env}/bin/activate && python gfpgan_cli.py --input {test_input} --output output/test_output.jpg --scale 2 --quality fast"
+            f"source {gfpgan_env}/bin/activate && python gfpgan_core.py --input {test_input} --output output/test_output.jpg --scale 2 --quality fast"
         ]
         
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)

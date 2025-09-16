@@ -105,7 +105,7 @@ wget -O models/gfpgan/GFPGANv1.4.pth \
 ./test_installation.sh
 
 # 测试处理单张图片
-python gfpgan_cli.py \
+python gfpgan_core.py \
     --input input/sample_input.jpg \
     --output output/sample_output.jpg \
     --tile 400
@@ -115,13 +115,13 @@ python gfpgan_cli.py \
 
 ```bash
 # 小图片测试 (快速)
-python gfpgan_cli.py \
+python gfpgan_core.py \
     --input input/sample_input.jpg \
     --output output/test_small.jpg \
     --tile 256
 
 # 大图片测试 (质量)
-python gfpgan_cli.py \
+python gfpgan_core.py \
     --input input/sample_input.jpg \
     --output output/test_large.jpg \
     --tile 512
@@ -152,7 +152,7 @@ watch -n 1 nvidia-smi
 ```bash
 # 处理目录中的所有图片
 for file in input_dir/*.jpg; do
-    python gfpgan_cli.py \
+    python gfpgan_core.py \
         --input "$file" \
         --output "output_dir/$(basename "$file" .jpg)_enhanced.jpg" \
         --tile 400
@@ -182,7 +182,7 @@ RUN ./deploy/setup_environment.sh
 RUN ./models/download_models.sh
 
 # 设置入口点
-ENTRYPOINT ["python", "gfpgan_cli.py"]
+ENTRYPOINT ["python", "gfpgan_core.py"]
 ```
 
 ### 运行Docker容器
@@ -214,10 +214,10 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 
 ```bash
 # 减小tile大小
-python gfpgan_cli.py --tile 256
+python gfpgan_core.py --tile 256
 
 # 或者使用CPU模式 (很慢)
-CUDA_VISIBLE_DEVICES="" python gfpgan_cli.py
+CUDA_VISIBLE_DEVICES="" python gfpgan_core.py
 ```
 
 #### 3. 模型文件损坏
@@ -240,7 +240,7 @@ rm -rf swinir_env gfpgan_env
 
 ```bash
 # 启用详细日志
-python gfpgan_cli.py --input image.jpg --output output.jpg --verbose
+python gfpgan_core.py --input image.jpg --output output.jpg --verbose
 
 # 检查GPU使用情况
 nvidia-smi -l 1

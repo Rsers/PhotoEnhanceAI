@@ -216,7 +216,7 @@ if [ -f "$SWINIR_MODEL_PATH" ] && [ -f "$GFPGAN_MODEL_PATH" ]; then
     echo "🎉 All models downloaded successfully!"
     echo ""
     print_status "You can now run PhotoEnhanceAI:"
-    echo "python gfpgan_cli.py --input your_image.jpg --output enhanced_image.jpg"
+    echo "python gfpgan_core.py --input your_image.jpg --output enhanced_image.jpg"
     echo ""
 else
     echo ""
