@@ -22,6 +22,9 @@ AI驱动的人像图像增强服务，使用GFPGAN一体化解决方案，集成
 | `install.sh` | 一键安装部署 | 新服务器从零部署 |
 | `quick_start_api.sh` | 极简启动API | 开发环境快速启动 |
 | `verbose_info_start_api.sh` | 详细信息启动API | 生产环境安全启动 |
+| `start_service.sh` | 常驻服务启动 | 后台运行，关闭终端后继续 |
+| `stop_service.sh` | 停止常驻服务 | 安全停止后台服务 |
+| `status_service.sh` | 服务状态检查 | 查看服务运行状态和日志 |
 | `local_gfpgan_test.py` | 本地功能测试 | 验证环境配置 |
 | `quick_enhance.sh` | 快速图像增强 | 交互式图片处理 |
 | `gfpgan_core.py` | 核心处理引擎 | 命令行图片增强 |
@@ -84,6 +87,9 @@ python gfpgan_core.py --input input/test001.jpg --output output/enhanced.jpg --s
 
 # 详细信息启动（生产环境）
 ./verbose_info_start_api.sh
+
+# 常驻服务启动（推荐生产环境）
+./start_service.sh
 ```
 
 5. **体验流式处理方案**
@@ -98,7 +104,22 @@ python test_stream_performance.py
 python demo_stream_processing.py
 ```
 
-6. **快速图像增强**
+6. **服务管理**
+```bash
+# 启动常驻服务（后台运行）
+./start_service.sh
+
+# 查看服务状态
+./status_service.sh
+
+# 停止服务
+./stop_service.sh
+
+# 查看服务日志
+tail -f logs/photoenhanceai.log
+```
+
+7. **快速图像增强**
 ```bash
 # 交互式增强工具
 ./quick_enhance.sh
@@ -500,6 +521,9 @@ PhotoEnhanceAI/
 ├── gfpgan_core.py        # GFPGAN核心处理引擎
 ├── quick_start_api.sh    # 极简启动API服务
 ├── verbose_info_start_api.sh # 详细信息启动API服务
+├── start_service.sh      # 常驻服务启动脚本
+├── stop_service.sh       # 停止常驻服务脚本
+├── status_service.sh     # 服务状态检查脚本
 ├── local_gfpgan_test.py  # 本地功能测试脚本
 ├── quick_enhance.sh      # 快速图像增强工具
 ├── start_stream_demo.sh  # 流式处理演示启动脚本
@@ -696,7 +720,29 @@ PhotoEnhanceAI/
 
 ## 🚀 生产部署
 
-### Docker部署 (推荐)
+### 常驻服务部署（推荐）
+
+```bash
+# 启动常驻服务（后台运行，关闭终端后继续）
+./start_service.sh
+
+# 查看服务状态
+./status_service.sh
+
+# 停止服务
+./stop_service.sh
+
+# 查看服务日志
+tail -f logs/photoenhanceai.log
+```
+
+**服务特性**：
+- ✅ **常驻运行**：关闭终端后继续运行
+- ✅ **自动重启**：进程崩溃后自动重启
+- ✅ **日志记录**：所有输出保存到日志文件
+- ✅ **PID 管理**：通过 PID 文件管理进程
+
+### Docker部署
 
 ```bash
 # 构建镜像
@@ -785,16 +831,19 @@ sudo supervisorctl restart photoenhanceai
 ### 一键体验
 
 ```bash
-# 1. 启动API服务器
-./quick_start_api.sh
+# 1. 启动API服务器（常驻服务）
+./start_service.sh
 
-# 2. 启动流式处理演示
+# 2. 查看服务状态
+./status_service.sh
+
+# 3. 启动流式处理演示
 ./start_stream_demo.sh
 
-# 3. 运行性能测试
+# 4. 运行性能测试
 python test_stream_performance.py
 
-# 4. 查看方案说明
+# 5. 查看方案说明
 python demo_stream_processing.py
 ```
 
