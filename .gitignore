@@ -76,6 +76,10 @@ htmlcov/
 logs/
 *.log
 
+# PID files (process management)
+*.pid
+photoenhanceai.pid
+
 # Environment variables
 .env
 .env.local
@@ -97,6 +101,8 @@ Dockerfile.dev
 # Backup files
 *.bak
 *.backup
+*.md.backup
+*.sh.backup
 
 # Large test images (should be in examples/ but ignored from git)
 examples/*.jpg
@@ -108,14 +114,19 @@ examples/*.jpeg
 # Processing directories (generated content)
 input/*
 !input/test001.jpg
+!input/.gitkeep
 output/*
 !output/.gitkeep
+
+# Trash directory (user safety rule - files moved before deletion)
 **/.trash/
 
-# Temporary log files
-/tmp/gfpgan_process.log
-*.log
+# Test results and performance data
+*_test_results.json
+concurrent_test_results.json
+performance_results.json
 
-# Backup files
-*.backup
-README.md.backup
+# Temporary processing files
+*_enhanced.jpg
+*_temp.jpg
+*_tmp.jpg
