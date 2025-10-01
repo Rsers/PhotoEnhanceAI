@@ -17,20 +17,20 @@ AI驱动的人像图像增强服务，使用GFPGAN一体化解决方案，集成
 
 ### 📋 脚本说明
 
-| 脚本 | 用途 | 适用场景 |
-|------|------|----------|
-| `install.sh` | 一键安装部署 | 新服务器从零部署 |
-| `quick_start_api.sh` | 极简启动API | 开发环境快速启动 |
-| `verbose_info_start_api.sh` | 详细信息启动API | 生产环境安全启动 |
-| `start_service.sh` | 常驻服务启动 | 后台运行，关闭终端后继续 |
-| `stop_service.sh` | 停止常驻服务 | 安全停止后台服务 |
-| `status_service.sh` | 服务状态检查 | 查看服务运行状态和日志 |
-| `local_gfpgan_test.py` | 本地功能测试 | 验证环境配置 |
-| `quick_enhance.sh` | 快速图像增强 | 交互式图片处理 |
-| `gfpgan_core.py` | 核心处理引擎 | 命令行图片增强 |
-| `start_stream_demo.sh` | 流式处理演示 | 体验最优批量处理方案 |
-| `test_stream_performance.py` | 性能测试 | 验证流式处理优势 |
-| `demo_stream_processing.py` | 方案说明 | 了解流式处理技术细节 |
+| 脚本 | 用途 | 适用场景 | 特点 |
+|------|------|----------|------|
+| `install.sh` | 一键安装部署 | 新服务器从零部署 | 自动化安装 |
+| `start_frontend_only.sh` | 前台启动API | 开发调试环境 | ⚠️ 占用终端、实时日志、Ctrl+C停止 |
+| `start_backend_daemon.sh` | 后台常驻服务 | 生产环境推荐 | ✅ 不占用终端、关闭终端继续运行 |
+| `verbose_info_start_api.sh` | 详细信息启动 | 详细诊断信息 | 显示完整的环境和配置信息 |
+| `stop_service.sh` | 停止常驻服务 | 安全停止后台服务 | 通过PID文件优雅关闭 |
+| `status_service.sh` | 服务状态检查 | 查看服务运行状态 | 检查进程和日志 |
+| `local_gfpgan_test.py` | 本地功能测试 | 验证环境配置 | 测试GFPGAN模型加载 |
+| `quick_enhance.sh` | 快速图像增强 | 交互式图片处理 | 命令行交互式工具 |
+| `gfpgan_core.py` | 核心处理引擎 | 命令行图片增强 | 直接调用处理引擎 |
+| `start_stream_demo.sh` | 流式处理演示 | 体验最优批量处理 | 启动演示页面 |
+| `test_stream_performance.py` | 性能测试 | 验证流式处理优势 | 并发数性能对比 |
+| `demo_stream_processing.py` | 方案说明 | 了解流式处理技术 | 技术细节说明 |
 
 ### 一键安装（推荐）
 
@@ -82,14 +82,14 @@ python gfpgan_core.py --input input/test001.jpg --output output/enhanced.jpg --s
 
 4. **启动API服务**
 ```bash
-# 极简启动（开发环境）
-./quick_start_api.sh
+# 前台启动（开发调试 - 占用终端，可看实时日志）
+./start_frontend_only.sh
 
-# 详细信息启动（生产环境）
+# 后台启动（生产环境推荐 - 不占用终端，关闭终端继续运行）
+./start_backend_daemon.sh
+
+# 详细信息启动（诊断模式 - 显示完整环境信息）
 ./verbose_info_start_api.sh
-
-# 常驻服务启动（推荐生产环境）
-./start_service.sh
 ```
 
 5. **体验流式处理方案**
@@ -106,8 +106,8 @@ python demo_stream_processing.py
 
 6. **服务管理**
 ```bash
-# 启动常驻服务（后台运行）
-./start_service.sh
+# 启动后台常驻服务（不占用终端，关闭终端后继续运行）
+./start_backend_daemon.sh
 
 # 查看服务状态
 ./status_service.sh
@@ -115,8 +115,11 @@ python demo_stream_processing.py
 # 停止服务
 ./stop_service.sh
 
-# 查看服务日志
+# 查看服务日志（实时）
 tail -f logs/photoenhanceai.log
+
+# 前台启动（开发调试，占用终端，可看实时日志）
+./start_frontend_only.sh
 ```
 
 7. **快速图像增强**
@@ -314,7 +317,10 @@ class StreamUploader {
 1. **启动API服务器**:
    ```bash
    cd /root/PhotoEnhanceAI
-   ./quick_start_api.sh
+   # 前台启动（开发调试）
+   ./start_frontend_only.sh
+   # 或后台启动（生产环境）
+   ./start_backend_daemon.sh
    ```
 
 2. **访问流式处理界面**:
@@ -519,9 +525,9 @@ PhotoEnhanceAI/
 │   ├── batch_test_api.html # 批量处理测试页面
 │   └── stream_processing.html # 流式处理演示页面
 ├── gfpgan_core.py        # GFPGAN核心处理引擎
-├── quick_start_api.sh    # 极简启动API服务
+├── start_frontend_only.sh # 前台启动脚本（开发调试）
+├── start_backend_daemon.sh # 后台常驻服务启动脚本（生产环境）
 ├── verbose_info_start_api.sh # 详细信息启动API服务
-├── start_service.sh      # 常驻服务启动脚本
 ├── stop_service.sh       # 停止常驻服务脚本
 ├── status_service.sh     # 服务状态检查脚本
 ├── local_gfpgan_test.py  # 本地功能测试脚本
@@ -723,8 +729,8 @@ PhotoEnhanceAI/
 ### 常驻服务部署（推荐）
 
 ```bash
-# 启动常驻服务（后台运行，关闭终端后继续）
-./start_service.sh
+# 启动后台常驻服务（不占用终端，关闭终端后继续运行）
+./start_backend_daemon.sh
 
 # 查看服务状态
 ./status_service.sh
@@ -732,15 +738,19 @@ PhotoEnhanceAI/
 # 停止服务
 ./stop_service.sh
 
-# 查看服务日志
+# 查看服务日志（实时）
 tail -f logs/photoenhanceai.log
+
+# 开发调试时使用前台启动（占用终端，实时查看日志）
+./start_frontend_only.sh
 ```
 
 **服务特性**：
-- ✅ **常驻运行**：关闭终端后继续运行
-- ✅ **自动重启**：进程崩溃后自动重启
-- ✅ **日志记录**：所有输出保存到日志文件
-- ✅ **PID 管理**：通过 PID 文件管理进程
+- ✅ **后台常驻**：关闭终端后继续运行，不占用终端窗口
+- ✅ **前台调试**：开发时可使用前台模式，实时查看日志输出
+- ✅ **日志记录**：后台模式所有输出保存到日志文件
+- ✅ **PID 管理**：通过 PID 文件管理进程，安全停止服务
+- ✅ **清晰提示**：启动时显示模式说明和切换提示
 
 ### Docker部署
 
@@ -831,8 +841,11 @@ sudo supervisorctl restart photoenhanceai
 ### 一键体验
 
 ```bash
-# 1. 启动API服务器（常驻服务）
-./start_service.sh
+# 1. 启动API服务器
+# 生产环境（后台常驻）
+./start_backend_daemon.sh
+# 或开发环境（前台调试）
+./start_frontend_only.sh
 
 # 2. 查看服务状态
 ./status_service.sh
@@ -845,6 +858,9 @@ python test_stream_performance.py
 
 # 5. 查看方案说明
 python demo_stream_processing.py
+
+# 6. 停止服务（仅后台模式需要）
+./stop_service.sh
 ```
 
 ### 在线演示
