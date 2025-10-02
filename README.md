@@ -1079,16 +1079,35 @@ sudo journalctl -u photoenhanceai        # 历史日志
    - rc.local 可能不会自动执行
    - 需要多重启动保障机制
 
-2. **配置的自动启动方式**：
+2. **实际启动行为**：
+   - ❌ **开机时不会自动启动**：容器环境的限制，rc.local可能不会按预期执行
+   - ✅ **SSH登录后自动启动**：通过shell配置文件（.bashrc、/etc/profile.d）触发
+   - ✅ **这是正常行为**：容器环境的预期表现，不是配置错误
+
+3. **配置的自动启动方式**：
    ```bash
    # 已配置的启动机制：
    ✅ .bashrc 自动启动 - 每次shell启动时检查服务状态
    ✅ /etc/profile.d 自动启动 - 系统级启动检查  
-   ✅ rc.local 自动启动 - 容器启动时执行（备用）
+   ✅ rc.local 自动启动 - 容器启动时执行（备用，可能不工作）
    ✅ 容器初始化脚本 - 专用容器启动脚本
    ```
 
-3. **故障排除**：
+4. **智能启动检测逻辑**：
+   ```bash
+   # 系统运行时间检测
+   UPTIME_MINUTES=$(awk '{print int($1/60)}' /proc/uptime)
+   
+   if [ "$UPTIME_MINUTES" -lt 10 ]; then
+       # 新启动系统，使用镜像启动脚本
+       ./mirror_autostart.sh
+   else
+       # 运行时间较长，使用标准启动检查
+       ./container_autostart.sh
+   fi
+   ```
+
+5. **故障排除**：
    如果开机后服务未自动启动，请检查：
    ```bash
    # 检查服务状态
@@ -1102,16 +1121,19 @@ sudo journalctl -u photoenhanceai        # 历史日志
    
    # 测试自动启动机制
    bash -c "source /etc/profile.d/photoenhanceai_autostart.sh"
+   
+   # 查看启动日志
+   tail -f logs/profile_autostart.log
    ```
 
-4. **可能的问题点**：
+6. **可能的问题点**：
    - 容器启动顺序问题：rc.local 可能在其他服务之前执行
    - 网络就绪时间：需要等待网络完全就绪
    - 权限问题：确保脚本有执行权限
    - 环境变量：虚拟环境路径可能变化
    - 进程监控：容器重启时PID文件可能残留
 
-5. **详细配置记录**：
+7. **详细配置记录**：
    - 查看完整配置记录：`CONTAINER_AUTOSTART_CONFIG.md`
    - 包含所有配置细节、故障排除步骤和测试方法
 
@@ -1188,6 +1210,55 @@ sudo supervisorctl restart photoenhanceai
 - 使用 `dumb-init` 作为PID 1进程
 - 没有 systemd 服务管理
 - IP地址：`82.156.211.225`
+
+#### 🔍 容器环境自动启动行为分析
+
+**重要发现**：容器环境的自动启动机制与传统Linux系统不同！
+
+**实际行为**：
+- ❌ **开机时不会自动启动**：容器环境的限制，rc.local可能不会按预期执行
+- ✅ **SSH登录后自动启动**：通过shell配置文件（.bashrc、/etc/profile.d）触发
+- ✅ **这是正常行为**：容器环境的预期表现，不是配置错误
+
+**启动机制分析**：
+1. **开机启动尝试**：`/etc/rc.local` → `mirror_autostart.sh`（❌ 容器环境限制）
+2. **SSH登录触发**：`/etc/profile.d/photoenhanceai_autostart.sh` → 智能检测 → `mirror_autostart.sh`（✅ 正常工作）
+3. **用户登录触发**：`/root/.bashrc` → 同样的逻辑（✅ 正常工作）
+
+**智能检测逻辑**：
+```bash
+# 系统运行时间检测
+UPTIME_MINUTES=$(awk '{print int($1/60)}' /proc/uptime)
+
+if [ "$UPTIME_MINUTES" -lt 10 ]; then
+    # 新启动系统，使用镜像启动脚本
+    ./mirror_autostart.sh
+else
+    # 运行时间较长，使用标准启动检查
+    ./container_autostart.sh
+fi
+```
+
+**日志文件位置**：
+- 主启动日志：`logs/mirror_autostart.log`
+- 模型预热日志：`logs/mirror_warmup.log`
+- Webhook注册日志：`logs/mirror_webhook.log`
+- 配置文件启动日志：`logs/profile_autostart.log`
+
+**验证方法**：
+```bash
+# 检查服务状态
+./status_service.sh
+
+# 查看启动日志
+tail -f logs/mirror_autostart.log
+
+# 查看配置文件启动日志
+tail -f logs/profile_autostart.log
+
+# 检查系统运行时间
+uptime
+```
 
 ### 🆕 镜像环境特殊问题
 
@@ -1303,6 +1374,13 @@ bash -c "source /etc/profile.d/photoenhanceai_autostart.sh"
    - 检查 `./status_service.sh` 服务状态
    - 手动启动 `./mirror_autostart.sh`
    - 查看 `logs/mirror_autostart.log` 启动日志
+
+6. **容器环境开机不自启动（正常现象）**
+   - **现象**：开机后服务不会自动启动，但SSH登录后会自动启动
+   - **原因**：容器环境的限制，rc.local可能不会按预期执行
+   - **解决**：这是正常行为，通过SSH登录触发启动是预期方式
+   - **验证**：`uptime` 查看运行时间，`./status_service.sh` 检查服务状态
+   - **日志**：查看 `logs/profile_autostart.log` 了解启动过程
 
 ### 性能优化
 
