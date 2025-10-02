@@ -114,6 +114,7 @@ examples/*.jpeg
 # Processing directories (generated content)
 input/*
 !input/test001.jpg
+!input/warmup.jpg
 !input/.gitkeep
 output/*
 !output/.gitkeep
