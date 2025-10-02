@@ -37,6 +37,15 @@ echo "🔍 查看日志: tail -f logs/photoenhanceai.log"
 echo "🛑 停止服务: kill \$(cat photoenhanceai.pid)"
 echo ""
 
+# 启动模型预热（后台运行）
+echo "🔥 启动AI模型预热进程..."
+nohup ./warmup_model.sh > logs/model_warmup.log 2>&1 &
+echo $! > model_warmup.pid
+
+echo "✅ AI模型预热进程已启动，PID: $(cat model_warmup.pid)"
+echo "📝 模型预热日志: /root/PhotoEnhanceAI/logs/model_warmup.log"
+echo "🔍 查看预热日志: tail -f logs/model_warmup.log"
+
 # 启动webhook注册（后台运行）
 echo "🌐 启动webhook注册进程..."
 nohup ./register_webhook.sh > logs/webhook_register.log 2>&1 &
@@ -50,6 +59,7 @@ echo "=========================================="
 echo "提示："
 echo "  • 现在可以关闭终端，服务会继续运行"
 echo "  • 日志不会显示在屏幕上，需要查看日志文件"
+echo "  • AI模型预热将在后台自动进行"
 echo "  • Webhook注册将在后台自动进行"
 echo "=========================================="
 

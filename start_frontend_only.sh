@@ -32,6 +32,11 @@ echo $API_PID > photoenhanceai.pid
 # 等待服务启动
 sleep 5
 
+# 启动模型预热（前台显示）
+echo ""
+echo "🔥 开始AI模型预热..."
+./warmup_model.sh
+
 # 启动webhook注册（前台显示）
 echo ""
 echo "🌐 开始注册服务到API网关..."
