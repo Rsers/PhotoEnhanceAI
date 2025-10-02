@@ -134,5 +134,66 @@ PhotoEnhanceAI/
 
 ---
 
+## 🚨 重要问题记录
+
+### 内存溢出问题分析 (2025-10-02)
+
+#### 问题现象
+- SSH连接速度极慢
+- 系统资源被严重占用
+- 多个Python进程被系统强制杀死 (OOM)
+
+#### 根本原因
+1. **多重自动启动机制冲突**：
+   - 镜像环境自动启动 (`mirror_autostart.sh`)
+   - bashrc自动启动 (`~/.bashrc`)
+   - Supervisor服务管理
+   - 导致多个PhotoEnhanceAI实例同时运行
+
+2. **模型预热脚本失控**：
+   - 10+个 `warmup_model.sh` 脚本同时运行
+   - 每个AI模型加载需要13GB+内存
+   - 缺乏进程管理和并发控制
+
+3. **内存占用分析**：
+   ```
+   PID 3504: total-vm:13384972kB (13.3GB虚拟内存)
+   PID 3572: total-vm:13392644kB (13.3GB虚拟内存)
+   PID 3580: total-vm:13054844kB (13.0GB虚拟内存)
+   PID 3506: total-vm:13059580kB (13.0GB虚拟内存)
+   ```
+
+#### 解决方案
+1. **统一使用Supervisor管理**：
+   ```bash
+   # 只保留supervisor管理的服务
+   supervisorctl status
+   supervisorctl stop jupyter_lab  # 关闭不必要的服务
+   ```
+
+2. **禁用重复的自动启动机制**：
+   ```bash
+   # 检查并清理重复启动配置
+   grep -n "PhotoEnhanceAI" ~/.bashrc
+   grep -n "PhotoEnhanceAI" /etc/profile.d/
+   ```
+
+3. **清理残留进程和PID文件**：
+   ```bash
+   # 清理所有PID文件，防止重复启动
+   rm -f /root/PhotoEnhanceAI/*.pid
+   ```
+
+4. **优化内存使用**：
+   - 当前supervisor配置：内存限制8GB，CPU限制400%
+   - 建议监控模型预热脚本，确保不会同时运行多个实例
+
+#### 预防措施
+- 定期检查 `supervisorctl status` 确保服务状态正常
+- 监控内存使用：`free -h && ps aux --sort=-%mem | head -5`
+- 避免同时启用多种自动启动机制
+- 确保模型预热脚本有进程锁机制
+
+---
+
 ⭐ 如果这个项目对你有帮助，请给个Star支持一下！
-测试。
