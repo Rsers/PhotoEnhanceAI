@@ -3,6 +3,30 @@
 # PhotoEnhanceAI - AI模型预热脚本
 # 用于在服务启动后自动预热AI模型，让模型常驻内存
 
+# 进程锁机制 - 防止多个实例同时运行
+LOCK_FILE="/root/PhotoEnhanceAI/warmup_model.lock"
+PID_FILE="/root/PhotoEnhanceAI/warmup_model.pid"
+
+# 检查是否已有实例在运行
+if [ -f "$LOCK_FILE" ]; then
+    LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null)
+    if [ -n "$LOCK_PID" ] && ps -p "$LOCK_PID" > /dev/null 2>&1; then
+        echo "⚠️  模型预热脚本已在运行 (PID: $LOCK_PID)"
+        echo "🚫 跳过重复启动，避免内存溢出"
+        exit 0
+    else
+        echo "🧹 清理过期的锁文件"
+        rm -f "$LOCK_FILE"
+    fi
+fi
+
+# 创建锁文件
+echo $$ > "$LOCK_FILE"
+echo $$ > "$PID_FILE"
+
+# 设置退出时清理锁文件
+trap 'rm -f "$LOCK_FILE" "$PID_FILE"' EXIT
+
 echo "=========================================="
 echo "🔥 PhotoEnhanceAI AI模型预热"
 echo "=========================================="

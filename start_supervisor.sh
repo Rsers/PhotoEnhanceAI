@@ -5,6 +5,30 @@
 
 set -e
 
+# 进程锁机制 - 防止多个实例同时运行
+LOCK_FILE="/root/PhotoEnhanceAI/photoenhanceai.lock"
+PID_FILE="/root/PhotoEnhanceAI/photoenhanceai.pid"
+
+# 检查是否已有实例在运行
+if [ -f "$LOCK_FILE" ]; then
+    LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null)
+    if [ -n "$LOCK_PID" ] && ps -p "$LOCK_PID" > /dev/null 2>&1; then
+        echo "⚠️  PhotoEnhanceAI服务已在运行 (PID: $LOCK_PID)"
+        echo "🚫 跳过重复启动，避免内存溢出"
+        exit 0
+    else
+        echo "🧹 清理过期的锁文件"
+        rm -f "$LOCK_FILE"
+    fi
+fi
+
+# 创建锁文件
+echo $$ > "$LOCK_FILE"
+echo $$ > "$PID_FILE"
+
+# 设置退出时清理锁文件
+trap 'rm -f "$LOCK_FILE" "$PID_FILE"' EXIT
+
 echo "🚀 启动PhotoEnhanceAI (Supervisor模式)"
 echo "⏰ 启动时间: $(date)"
 echo "📁 工作目录: $(pwd)"
