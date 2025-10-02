@@ -707,6 +707,10 @@ PhotoEnhanceAI/
 ├── verbose_info_start_api.sh # 详细信息启动API服务
 ├── stop_service.sh       # 停止常驻服务脚本
 ├── status_service.sh     # 服务状态检查脚本
+├── container_autostart.sh # 容器环境自启动脚本
+├── container_init.sh     # 容器初始化脚本
+├── setup_container_autostart.sh # 容器自动启动配置脚本
+├── CONTAINER_AUTOSTART_CONFIG.md # 容器自动启动配置记录
 ├── local_gfpgan_test.py  # 本地功能测试脚本
 ├── quick_enhance.sh      # 快速图像增强工具
 ├── start_stream_demo.sh  # 流式处理演示启动脚本
@@ -987,16 +991,67 @@ sudo journalctl -u photoenhanceai        # 历史日志
 
 #### 容器环境自启动
 
+**腾讯云容器环境专用配置**：
+
 ```bash
-# 容器环境专用启动脚本
+# 1. 一键配置容器自动启动（推荐）
+./setup_container_autostart.sh
+
+# 2. 或手动使用容器启动脚本
 ./container_autostart.sh
 
 # 特点：
 # - 自动等待网络就绪
 # - 启动主服务、模型预热、webhook注册
 # - 服务监控和自动重启
-# - 适合 Docker 容器或非 systemd 环境
+# - 适合腾讯云容器、Docker 容器或非 systemd 环境
 ```
+
+**腾讯云容器环境特殊性**：
+
+⚠️ **重要说明**：腾讯云容器环境（非用户自建Docker）与传统Linux系统不同：
+
+1. **系统特性**：
+   - 使用 `dumb-init` 作为PID 1进程
+   - 没有 systemd 服务管理
+   - rc.local 可能不会自动执行
+   - 需要多重启动保障机制
+
+2. **配置的自动启动方式**：
+   ```bash
+   # 已配置的启动机制：
+   ✅ .bashrc 自动启动 - 每次shell启动时检查服务状态
+   ✅ /etc/profile.d 自动启动 - 系统级启动检查  
+   ✅ rc.local 自动启动 - 容器启动时执行（备用）
+   ✅ 容器初始化脚本 - 专用容器启动脚本
+   ```
+
+3. **故障排除**：
+   如果开机后服务未自动启动，请检查：
+   ```bash
+   # 检查服务状态
+   ./status_service.sh
+   
+   # 手动启动服务
+   ./start_backend_daemon.sh
+   
+   # 重新配置自动启动
+   ./setup_container_autostart.sh
+   
+   # 测试自动启动机制
+   bash -c "source /etc/profile.d/photoenhanceai_autostart.sh"
+   ```
+
+4. **可能的问题点**：
+   - 容器启动顺序问题：rc.local 可能在其他服务之前执行
+   - 网络就绪时间：需要等待网络完全就绪
+   - 权限问题：确保脚本有执行权限
+   - 环境变量：虚拟环境路径可能变化
+   - 进程监控：容器重启时PID文件可能残留
+
+5. **详细配置记录**：
+   - 查看完整配置记录：`CONTAINER_AUTOSTART_CONFIG.md`
+   - 包含所有配置细节、故障排除步骤和测试方法
 
 #### 手动设置方式
 
@@ -1060,6 +1115,61 @@ sudo supervisorctl restart photoenhanceai
 
 ## 🔍 故障排除
 
+### 腾讯云容器环境特殊问题
+
+#### 开机自启动问题
+
+**问题现象**：容器重启后PhotoEnhanceAI服务未自动启动
+
+**环境特征**：
+- 腾讯云容器环境（非用户自建Docker）
+- 使用 `dumb-init` 作为PID 1进程
+- 没有 systemd 服务管理
+- IP地址：`82.156.211.225`
+
+**已配置的解决方案**：
+```bash
+# 1. 检查当前配置状态
+ls -la /etc/profile.d/photoenhanceai_autostart.sh
+ls -la /root/.bashrc | grep PhotoEnhanceAI
+ls -la /etc/rc.local
+
+# 2. 重新配置自动启动（推荐）
+./setup_container_autostart.sh
+
+# 3. 手动启动服务
+./start_backend_daemon.sh
+
+# 4. 验证服务状态
+./status_service.sh
+curl http://localhost:8000/health
+```
+
+**可能的问题原因**：
+1. **容器启动顺序**：rc.local 执行时机过早，网络未就绪
+2. **进程监控失效**：PID文件残留但进程已退出
+3. **环境变量变化**：虚拟环境路径在容器重启后可能变化
+4. **权限问题**：脚本执行权限在容器重启后丢失
+5. **网络延迟**：容器网络初始化时间较长
+
+**配置记录**：
+- ✅ 已配置 `.bashrc` 自动启动检查
+- ✅ 已配置 `/etc/profile.d` 系统级启动检查
+- ✅ 已配置 `rc.local` 容器启动脚本
+- ✅ 已创建 `container_init.sh` 专用启动脚本
+- ✅ 已创建 `setup_container_autostart.sh` 一键配置脚本
+
+**测试方法**：
+```bash
+# 测试自动启动机制
+bash -c "source /etc/profile.d/photoenhanceai_autostart.sh"
+
+# 模拟容器重启测试
+pkill -f "python api/start_server.py"
+rm -f /root/PhotoEnhanceAI/*.pid
+bash -c "source /etc/profile.d/photoenhanceai_autostart.sh"
+```
+
 ### 常见问题
 
 1. **CUDA内存不足**
@@ -1076,6 +1186,11 @@ sudo supervisorctl restart photoenhanceai
    - 增加请求超时时间
    - 检查网络连接
    - 验证服务端口开放
+
+4. **容器环境服务未启动**
+   - 执行 `./setup_container_autostart.sh` 重新配置
+   - 检查 `./status_service.sh` 服务状态
+   - 手动启动 `./start_backend_daemon.sh`
 
 ### 性能优化
 
