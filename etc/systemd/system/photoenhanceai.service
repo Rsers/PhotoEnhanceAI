@@ -1,0 +1,29 @@
+[Unit]
+Description=PhotoEnhanceAI 图片增强AI服务
+Documentation=https://github.com/yourusername/PhotoEnhanceAI
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/root/PhotoEnhanceAI
+Environment=PATH=/root/PhotoEnhanceAI/gfpgan_env/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=PYTHONPATH=/root/PhotoEnhanceAI
+ExecStart=/root/PhotoEnhanceAI/gfpgan_env/bin/python /root/PhotoEnhanceAI/api/start_server.py
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=append:/root/PhotoEnhanceAI/logs/systemd.log
+StandardError=append:/root/PhotoEnhanceAI/logs/systemd_error.log
+SyslogIdentifier=photoenhanceai
+
+# 安全设置
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/root/PhotoEnhanceAI
+
+[Install]
+WantedBy=multi-user.target
