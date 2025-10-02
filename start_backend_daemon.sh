@@ -36,9 +36,20 @@ echo "📝 日志文件: /root/PhotoEnhanceAI/logs/photoenhanceai.log"
 echo "🔍 查看日志: tail -f logs/photoenhanceai.log"
 echo "🛑 停止服务: kill \$(cat photoenhanceai.pid)"
 echo ""
+
+# 启动webhook注册（后台运行）
+echo "🌐 启动webhook注册进程..."
+nohup ./register_webhook.sh > logs/webhook_register.log 2>&1 &
+echo $! > webhook_register.pid
+
+echo "✅ Webhook注册进程已启动，PID: $(cat webhook_register.pid)"
+echo "📝 Webhook日志: /root/PhotoEnhanceAI/logs/webhook_register.log"
+echo "🔍 查看注册日志: tail -f logs/webhook_register.log"
+echo ""
 echo "=========================================="
 echo "提示："
 echo "  • 现在可以关闭终端，服务会继续运行"
 echo "  • 日志不会显示在屏幕上，需要查看日志文件"
+echo "  • Webhook注册将在后台自动进行"
 echo "=========================================="
 

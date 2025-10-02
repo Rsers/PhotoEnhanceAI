@@ -22,5 +22,23 @@ cd /root/PhotoEnhanceAI
 source gfpgan_env/bin/activate
 
 # 前台启动API服务（会占用终端）
-python api/start_server.py
+echo "🚀 启动API服务..."
+python api/start_server.py &
+
+# 保存进程ID
+API_PID=$!
+echo $API_PID > photoenhanceai.pid
+
+# 等待服务启动
+sleep 5
+
+# 启动webhook注册（前台显示）
+echo ""
+echo "🌐 开始注册服务到API网关..."
+./register_webhook.sh
+
+# 等待API服务进程
+echo ""
+echo "⏳ API服务正在运行，按 Ctrl+C 停止服务..."
+wait $API_PID
 
