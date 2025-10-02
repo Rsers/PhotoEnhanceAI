@@ -13,10 +13,10 @@ cd /root/PhotoEnhanceAI
 # 激活虚拟环境
 source gfpgan_env/bin/activate
 
-# 检查测试图片是否存在
-TEST_IMAGE="/root/PhotoEnhanceAI/input/test001.jpg"
+# 检查预热图片是否存在
+TEST_IMAGE="/root/PhotoEnhanceAI/input/warmup.jpg"
 if [ ! -f "$TEST_IMAGE" ]; then
-    echo "⚠️  测试图片不存在: $TEST_IMAGE"
+    echo "⚠️  预热图片不存在: $TEST_IMAGE"
     echo "🔧 尝试查找其他测试图片..."
     
     # 查找其他测试图片
@@ -24,12 +24,12 @@ if [ ! -f "$TEST_IMAGE" ]; then
     
     if [ -z "$TEST_IMAGE" ]; then
         echo "❌ 未找到任何测试图片"
-        echo "📁 请在 /root/PhotoEnhanceAI/input/ 目录下放置测试图片"
+        echo "📁 请在 /root/PhotoEnhanceAI/input/ 目录下放置预热图片"
         exit 1
     fi
 fi
 
-echo "✅ 使用测试图片: $TEST_IMAGE"
+echo "✅ 使用预热图片: $TEST_IMAGE"
 
 # 创建输出目录
 OUTPUT_DIR="/root/PhotoEnhanceAI/output"
