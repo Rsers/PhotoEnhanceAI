@@ -12,6 +12,7 @@ AI驱动的人像图像增强服务，使用GFPGAN一体化解决方案，集成
 - 📱 **跨平台**: 支持各种前端框架集成
 - 🔥 **内置超分辨率**: GFPGAN集成RealESRGAN，无需额外模型
 - 💾 **模型常驻内存**: 避免重复加载，处理速度提升62%
+- 🔗 **自动注册**: 启动后自动查询公网IP并注册到API网关
 
 ## 🚀 快速开始
 
@@ -20,8 +21,8 @@ AI驱动的人像图像增强服务，使用GFPGAN一体化解决方案，集成
 | 脚本 | 用途 | 适用场景 | 特点 |
 |------|------|----------|------|
 | `install.sh` | 一键安装部署 | 新服务器从零部署 | 自动化安装 |
-| `start_frontend_only.sh` | 前台启动API | 开发调试环境 | ⚠️ 占用终端、实时日志、Ctrl+C停止 |
-| `start_backend_daemon.sh` | 后台常驻服务 | 生产环境推荐 | ✅ 不占用终端、关闭终端继续运行 |
+| `start_frontend_only.sh` | 前台启动API | 开发调试环境 | ⚠️ 占用终端、实时日志、Ctrl+C停止、自动注册webhook |
+| `start_backend_daemon.sh` | 后台常驻服务 | 生产环境推荐 | ✅ 不占用终端、关闭终端继续运行、自动注册webhook |
 | `verbose_info_start_api.sh` | 详细信息启动 | 详细诊断信息 | 显示完整的环境和配置信息 |
 | `stop_service.sh` | 停止常驻服务 | 安全停止后台服务 | 通过PID文件优雅关闭 |
 | `status_service.sh` | 服务状态检查 | 查看服务运行状态 | 检查进程和日志 |
@@ -31,6 +32,7 @@ AI驱动的人像图像增强服务，使用GFPGAN一体化解决方案，集成
 | `start_stream_demo.sh` | 流式处理演示 | 体验最优批量处理 | 启动演示页面 |
 | `test_stream_performance.py` | 性能测试 | 验证流式处理优势 | 并发数性能对比 |
 | `demo_stream_processing.py` | 方案说明 | 了解流式处理技术 | 技术细节说明 |
+| `register_webhook.sh` | Webhook注册 | 自动注册到API网关 | 查询公网IP并注册服务 |
 
 ### 一键安装（推荐）
 
@@ -106,7 +108,7 @@ python demo_stream_processing.py
 
 6. **服务管理**
 ```bash
-# 启动后台常驻服务（不占用终端，关闭终端后继续运行）
+# 启动后台常驻服务（不占用终端，关闭终端后继续运行，自动注册webhook）
 ./start_backend_daemon.sh
 
 # 查看服务状态
@@ -118,8 +120,14 @@ python demo_stream_processing.py
 # 查看服务日志（实时）
 tail -f logs/photoenhanceai.log
 
-# 前台启动（开发调试，占用终端，可看实时日志）
+# 查看webhook注册日志（实时）
+tail -f logs/webhook_register.log
+
+# 前台启动（开发调试，占用终端，可看实时日志，自动注册webhook）
 ./start_frontend_only.sh
+
+# 手动注册webhook（如果需要重新注册）
+./register_webhook.sh
 ```
 
 7. **快速图像增强**
@@ -127,6 +135,86 @@ tail -f logs/photoenhanceai.log
 # 交互式增强工具
 ./quick_enhance.sh
 ```
+
+## 🔗 Webhook自动注册
+
+PhotoEnhanceAI支持启动后自动注册到API网关，无需手动配置。
+
+### ✨ 功能特性
+
+- 🌍 **自动IP查询**：支持多个IP查询服务，确保获取公网IP
+- 🔍 **健康检查**：验证本地API服务状态
+- 📡 **自动注册**：启动后自动调用API网关注册接口
+- 📝 **详细日志**：记录注册过程和结果
+- 🔄 **错误处理**：网络异常时自动重试
+
+### 🚀 使用方法
+
+启动服务时会自动进行webhook注册：
+
+```bash
+# 后台模式启动（推荐生产环境）
+./start_backend_daemon.sh
+# ✅ 服务启动后自动在后台注册webhook
+
+# 前台模式启动（推荐开发环境）
+./start_frontend_only.sh
+# ✅ 服务启动后在前台显示注册过程
+```
+
+### 📊 注册流程
+
+1. **服务启动** → API服务在8000端口启动
+2. **等待启动** → 等待10秒确保服务完全启动
+3. **健康检查** → 验证本地API服务状态
+4. **IP查询** → 自动查询公网IP地址
+5. **Webhook注册** → 调用API网关注册接口
+6. **结果显示** → 显示注册结果和访问地址
+
+### 📁 日志文件
+
+- **API服务日志**：`logs/photoenhanceai.log`
+- **Webhook注册日志**：`logs/webhook_register.log`
+- **进程ID文件**：`photoenhanceai.pid`、`webhook_register.pid`
+
+### 🔧 配置参数
+
+在`register_webhook.sh`中可以修改：
+
+```bash
+WEBHOOK_URL="https://www.gongjuxiang.work/webhook/register"
+SECRET="gpu-server-register-to-api-gateway-2024"
+API_PORT=8000
+```
+
+### 📝 注册请求格式
+
+```json
+{
+    "ip": "GPU服务器的公网IP地址",
+    "port": 8000,
+    "secret": "gpu-server-register-to-api-gateway-2024"
+}
+```
+
+### 🎯 手动注册
+
+如果需要手动重新注册：
+
+```bash
+# 手动注册webhook
+./register_webhook.sh
+
+# 查看注册日志
+tail -f logs/webhook_register.log
+```
+
+### ⚠️ 注意事项
+
+- 确保服务器有公网IP和网络连接
+- 注册成功后会显示访问地址
+- 如果注册失败，请检查网络连接和API网关地址
+- 支持多个IP查询服务作为备选方案
 
 ## 🌐 API使用
 
@@ -527,6 +615,7 @@ PhotoEnhanceAI/
 ├── gfpgan_core.py        # GFPGAN核心处理引擎
 ├── start_frontend_only.sh # 前台启动脚本（开发调试）
 ├── start_backend_daemon.sh # 后台常驻服务启动脚本（生产环境）
+├── register_webhook.sh # Webhook自动注册脚本
 ├── verbose_info_start_api.sh # 详细信息启动API服务
 ├── stop_service.sh       # 停止常驻服务脚本
 ├── status_service.sh     # 服务状态检查脚本
@@ -751,6 +840,7 @@ tail -f logs/photoenhanceai.log
 - ✅ **日志记录**：后台模式所有输出保存到日志文件
 - ✅ **PID 管理**：通过 PID 文件管理进程，安全停止服务
 - ✅ **清晰提示**：启动时显示模式说明和切换提示
+- ✅ **自动注册**：启动后自动查询公网IP并注册到API网关
 
 ### Docker部署
 
@@ -841,7 +931,7 @@ sudo supervisorctl restart photoenhanceai
 ### 一键体验
 
 ```bash
-# 1. 启动API服务器
+# 1. 启动API服务器（自动注册webhook）
 # 生产环境（后台常驻）
 ./start_backend_daemon.sh
 # 或开发环境（前台调试）
@@ -850,16 +940,19 @@ sudo supervisorctl restart photoenhanceai
 # 2. 查看服务状态
 ./status_service.sh
 
-# 3. 启动流式处理演示
+# 3. 查看webhook注册日志
+tail -f logs/webhook_register.log
+
+# 4. 启动流式处理演示
 ./start_stream_demo.sh
 
-# 4. 运行性能测试
+# 5. 运行性能测试
 python test_stream_performance.py
 
-# 5. 查看方案说明
+# 6. 查看方案说明
 python demo_stream_processing.py
 
-# 6. 停止服务（仅后台模式需要）
+# 7. 停止服务（仅后台模式需要）
 ./stop_service.sh
 ```
 
