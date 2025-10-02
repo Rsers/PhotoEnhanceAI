@@ -31,6 +31,8 @@ AI驱动的人像图像增强服务，使用GFPGAN一体化解决方案，集成
 | `install_systemd_service.sh` | systemd服务安装 | systemd系统 | 安装systemd服务并启用开机自启 |
 | `manage_service.sh` | 服务管理脚本 | 便捷服务控制 | 启动、停止、状态、日志等管理功能 |
 | `container_autostart.sh` | 容器环境自启动 | Docker容器环境 | 容器优化的启动脚本，包含监控功能 |
+| `mirror_autostart.sh` | 镜像环境自启动 | 镜像文件部署 | 智能检测镜像环境，自动适配新服务器 |
+| `setup_mirror_autostart.sh` | 镜像环境配置 | 一键配置镜像启动 | 自动配置所有镜像环境启动机制 |
 | `local_gfpgan_test.py` | 本地功能测试 | 验证环境配置 | 测试GFPGAN模型加载 |
 | `quick_enhance.sh` | 快速图像增强 | 交互式图片处理 | 命令行交互式工具 |
 | `gfpgan_core.py` | 核心处理引擎 | 命令行图片增强 | 直接调用处理引擎 |
@@ -711,6 +713,9 @@ PhotoEnhanceAI/
 ├── container_init.sh     # 容器初始化脚本
 ├── setup_container_autostart.sh # 容器自动启动配置脚本
 ├── CONTAINER_AUTOSTART_CONFIG.md # 容器自动启动配置记录
+├── mirror_autostart.sh   # 镜像环境自启动脚本
+├── setup_mirror_autostart.sh # 镜像环境自动启动配置脚本
+├── MIRROR_AUTOSTART_SOLUTION.md # 镜像环境自动启动解决方案
 ├── local_gfpgan_test.py  # 本地功能测试脚本
 ├── quick_enhance.sh      # 快速图像增强工具
 ├── start_stream_demo.sh  # 流式处理演示启动脚本
@@ -953,6 +958,63 @@ sudo ./setup_autostart.sh
 | **rc.local** | 传统启动脚本 | 兼容性好、简单 | 老版本系统 |
 | **cron** | @reboot 任务 | 轻量级、跨平台 | 容器环境、云服务器 |
 | **container** | 容器启动脚本 | 专门优化 | Docker 容器 |
+| **mirror** | 镜像环境启动 | 智能检测、环境适配 | 镜像文件部署 |
+
+#### 🆕 镜像环境自动启动（推荐）
+
+**适用场景**：使用镜像文件在新服务器上开机部署
+
+**问题背景**：镜像环境与原始环境存在差异，导致自动启动机制失效
+
+**解决方案**：智能检测镜像环境，自动适配新服务器环境
+
+```bash
+# 一键配置镜像环境自动启动
+./setup_mirror_autostart.sh
+```
+
+**核心特性**：
+- 🧠 **智能检测**：根据系统运行时间判断环境类型
+- 🧹 **环境清理**：自动清理旧PID文件和进程状态
+- 🌐 **网络适配**：延长网络初始化等待时间
+- 🎮 **硬件检测**：检查GPU和CUDA环境状态
+- 🔄 **多重保障**：配置多种自动启动机制
+- 📝 **详细日志**：记录启动过程和问题诊断
+
+**启动流程**：
+```
+1. 系统开机 → 2. 智能检测环境 → 3. 清理旧状态 → 4. 等待网络就绪
+   ↓
+5. 检查硬件环境 → 6. 启动主服务 → 7. 模型预热 → 8. Webhook注册
+```
+
+**配置特点**：
+- **运行时间<10分钟**：使用镜像环境启动脚本
+- **运行时间>10分钟**：使用标准启动检查
+- **自动清理**：清理旧PID文件和进程状态
+- **延长等待**：网络等待20秒，硬件检测15秒
+- **状态验证**：检查服务、API、GPU状态
+
+**日志文件**：
+- `logs/mirror_autostart.log` - 镜像启动日志
+- `logs/mirror_warmup.log` - 模型预热日志
+- `logs/mirror_webhook.log` - Webhook注册日志
+- `logs/profile_autostart.log` - 配置启动日志
+
+**故障排除**：
+```bash
+# 检查服务状态
+./status_service.sh
+
+# 查看启动日志
+tail -f logs/mirror_autostart.log
+
+# 手动启动
+./mirror_autostart.sh
+
+# 重新配置
+./setup_mirror_autostart.sh
+```
 
 #### systemd 服务方式（推荐）
 
@@ -1127,6 +1189,50 @@ sudo supervisorctl restart photoenhanceai
 - 没有 systemd 服务管理
 - IP地址：`82.156.211.225`
 
+### 🆕 镜像环境特殊问题
+
+#### 镜像文件部署自启动问题
+
+**问题现象**：使用镜像文件在新服务器上开机后PhotoEnhanceAI服务未自动启动
+
+**环境特征**：
+- 使用镜像文件在新服务器上部署
+- 网络环境、硬件环境、系统环境发生变化
+- 旧PID文件中的进程ID在新服务器上不存在
+- 可能出现"address already in use"错误
+
+**解决方案**：
+```bash
+# 1. 一键配置镜像环境自动启动（推荐）
+./setup_mirror_autostart.sh
+
+# 2. 手动启动镜像环境服务
+./mirror_autostart.sh
+
+# 3. 检查服务状态
+./status_service.sh
+
+# 4. 查看启动日志
+tail -f logs/mirror_autostart.log
+```
+
+**配置特点**：
+- 🧠 **智能检测**：根据系统运行时间判断环境类型
+- 🧹 **环境清理**：自动清理旧PID文件和进程状态
+- 🌐 **网络适配**：延长网络初始化等待时间
+- 🎮 **硬件检测**：检查GPU和CUDA环境状态
+- 🔄 **多重保障**：配置多种自动启动机制
+- 📝 **详细日志**：记录启动过程和问题诊断
+
+**可能的问题原因**：
+1. **网络环境变化**：新服务器IP地址、网络接口不同
+2. **硬件环境变化**：GPU设备ID、硬件驱动状态不同
+3. **系统环境变化**：主机名、系统时间、文件系统状态不同
+4. **进程状态问题**：旧PID文件中的进程ID在新服务器上不存在
+5. **端口绑定失败**：可能出现"address already in use"错误
+
+**详细解决方案**：查看 `MIRROR_AUTOSTART_SOLUTION.md`
+
 **已配置的解决方案**：
 ```bash
 # 1. 检查当前配置状态
@@ -1192,6 +1298,12 @@ bash -c "source /etc/profile.d/photoenhanceai_autostart.sh"
    - 检查 `./status_service.sh` 服务状态
    - 手动启动 `./start_backend_daemon.sh`
 
+5. **镜像环境服务未启动**
+   - 执行 `./setup_mirror_autostart.sh` 重新配置
+   - 检查 `./status_service.sh` 服务状态
+   - 手动启动 `./mirror_autostart.sh`
+   - 查看 `logs/mirror_autostart.log` 启动日志
+
 ### 性能优化
 
 1. **服务器端**
@@ -1240,6 +1352,8 @@ bash -c "source /etc/profile.d/photoenhanceai_autostart.sh"
 ./start_backend_daemon.sh
 # 或开发环境（前台调试）
 ./start_frontend_only.sh
+# 或镜像环境（智能检测）
+./mirror_autostart.sh
 
 # 2. 查看服务状态
 ./status_service.sh
