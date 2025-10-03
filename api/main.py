@@ -42,6 +42,18 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+@app.on_event("startup")
+async def startup_event():
+    """应用启动时自动初始化模型"""
+    print("🚀 PhotoEnhanceAI API服务启动中...")
+    print("🔥 开始模型预热...")
+    try:
+        await model_manager.initialize()
+        print("✅ 模型预热完成！模型已常驻内存")
+    except Exception as e:
+        print(f"⚠️ 模型预热失败: {e}")
+        print("💡 模型将在首次请求时自动加载")
+
 # CORS middleware for web frontend
 app.add_middleware(
     CORSMiddleware,
