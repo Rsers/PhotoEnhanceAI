@@ -32,10 +32,9 @@ echo $API_PID > photoenhanceai.pid
 # 等待服务启动
 sleep 5
 
-# 启动模型预热（前台显示）
+# 模型预热已集成到API服务启动中，无需独立启动
 echo ""
-echo "🔥 开始AI模型预热..."
-./warmup_model.sh
+echo "🔥 模型预热已集成到API服务中，将在服务启动时自动进行"
 
 # 启动webhook注册（前台显示）
 echo ""
@@ -44,6 +43,7 @@ echo "🌐 开始注册服务到API网关..."
 
 # 等待API服务进程
 echo ""
-echo "⏳ API服务正在运行，按 Ctrl+C 停止服务..."
+echo "⏳ API服务正在运行，模型预热将在服务启动时自动进行"
+echo "⏳ 按 Ctrl+C 停止服务..."
 wait $API_PID
 
